@@ -148,7 +148,7 @@ class _TodoInputFormState extends State<TodoInputForm> {
 
       // Input Form
       body: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -162,7 +162,7 @@ class _TodoInputFormState extends State<TodoInputForm> {
               ),
             ),
             SizedBox(
-              height: 8,
+              height: 16,
             ),
 
             // Description TextField
@@ -176,7 +176,7 @@ class _TodoInputFormState extends State<TodoInputForm> {
               ),
             ),
             SizedBox(
-              height: 8,
+              height: 16,
             ),
 
             // Deadline, Urgency and Tags

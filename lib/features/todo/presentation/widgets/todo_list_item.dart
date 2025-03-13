@@ -31,21 +31,21 @@ class _TodoListItemState extends State<TodoListItem> {
 
         // Card Color, red when urgent, teal when not -> soon to be replaced with color inherited from TodoListModel
         color: widget.data.isUrgent ? Colors.red[200] : Colors.teal[200],
-
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: IntrinsicHeight(
-            child: Row(
-              children: [
-
-                // CARD LEFT COLUMN
-                Flexible(
-                  flex: 1,
+        clipBehavior: Clip.hardEdge,
+        child: IntrinsicHeight(
+          child: Row(
+            children: [
+        
+              // CARD LEFT COLUMN
+              Flexible(
+                flex: 1,
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-
+                          
                       // Title, Flag when urgent
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -66,57 +66,108 @@ class _TodoListItemState extends State<TodoListItem> {
                           : Container(),
                         ],
                       ),
-
+                          
                       // Description
                       widget.data.description == null
                       ? Container()
                       : Text(
                         widget.data.description!,
                         style:
-                          TextStyle(fontSize: 16, color: Colors.white),
-                      ),
-
-                      // Deadline and Tags
-                      Wrap(spacing: 4, runSpacing: -4, children: [
-
-                        //deadline
-                        if (widget.data.deadline != null)
-                          Chip(
-                            label: Text(DateFormat('d.M.yyyy')
-                                .format(DateTime.fromMillisecondsSinceEpoch(
-                                    widget.data.deadline!))
-                                .toString()),
+                          TextStyle(
+                            height: 1.2,
+                            fontSize: 16,
+                            color: Colors.white
                           ),
-
-                        // tags
-                        if (widget.data.tags != null)
-                          for (var tag in widget.data.tags!) Chip(label: Text(tag)),
-                      ]),
+                      ),
+                          
+                      // Deadline and Tags
+                      Padding(
+                        padding: const EdgeInsets.only(top: 8.0),
+                        child: Wrap(spacing: 4, runSpacing: -4, children: [
+                            
+                          //deadline
+                          if (widget.data.deadline != null)
+                            Chip(
+                              label: Text(DateFormat('d.M.yyyy')
+                                  .format(DateTime.fromMillisecondsSinceEpoch(
+                                      widget.data.deadline!))
+                                  .toString()),
+                            ),
+                            
+                          // tags
+                          if (widget.data.tags != null)
+                            for (var tag in widget.data.tags!) Chip(label: Text('#$tag')),
+                        ]),
+                      ),
                     ],
                   ),
                 ),
-
-                VerticalDivider(
-                  color: Colors.white54,
-                  width: 32,
-                ),
-
-                // CARD RIGHT COLUMN
-                Checkbox(
-                  value: widget.data.isDone,
-                  side: BorderSide(
-                    color: Colors.white,
-                  ),
-                  checkColor: Colors.white,
-                  activeColor: Colors.white54,
-                  onChanged: (bool? value) {
+              ),
+        
+              GestureDetector(
+                onTap: () {
+                  if (widget.data.isDone == false) {
                     FirestoreTodoCRUD().updateTodo(widget.data.docID, {
-                      'isDone': value,
+                      'isDone': !widget.data.isDone,
                     });
                   }
-                ),
-              ],
-            ),
+                },
+
+                onLongPress: () {
+                  if (widget.data.isDone == true) {
+                    FirestoreTodoCRUD().updateTodo(widget.data.docID, {
+                      'isDone': !widget.data.isDone,
+                    });
+                  }
+                },
+
+                child: Container(
+                  color: widget.data.isUrgent 
+                    ? (widget.data.isDone? Colors.red[600] :Colors.red[300]) 
+                    :(widget.data.isDone? Colors.teal[600] :Colors.teal[300]),
+                  child:
+                      Row(
+                        children: [
+                          SizedBox(
+                            width: 16,
+                            child: Container(
+                               decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.topRight,
+                                  colors: [
+                                    Color.fromARGB(115, 0, 0, 0),
+                                    Color(0x00000000)
+                                  ]
+                                )
+                               ),
+                            ),
+                          ),
+                          SizedBox(
+                            width: 60,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(right: 10),
+                                  child: Icon(
+                                    widget.data.isDone ?Icons.check_circle_outline_rounded :Icons.circle_outlined,
+                                    size: 36,
+                                    color: Colors.white,
+                                    shadows: [
+                                      Shadow(color: Color.fromARGB(115, 0, 0, 0), blurRadius: 16.0)
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )
+                        ],
+                      )
+                  )
+                )
+            ],
           ),
         ),
       ),

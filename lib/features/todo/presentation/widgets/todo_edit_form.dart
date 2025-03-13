@@ -28,11 +28,15 @@ class _TodoEditFormState extends State<TodoEditForm> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Add Tag'),
-          content: TextField(
-            controller: _addTagController,
-            decoration: InputDecoration(
-              border: OutlineInputBorder(),
+          content: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TextField(
+              controller: _addTagController,
+              decoration: InputDecoration(
+                border: OutlineInputBorder(),
+                prefixText: '#',
+                hintText: 'Add Tag'
+              ),
             ),
           ),
           actions: [
@@ -41,7 +45,7 @@ class _TodoEditFormState extends State<TodoEditForm> {
                 Navigator.pop(context);
                 _addTagController.clear();
               },
-              child: Text('Dismiss')
+              child: Text('Dismiss', style: TextStyle(color: Colors.red),)
             ),
             TextButton(
               onPressed: () {
@@ -54,7 +58,7 @@ class _TodoEditFormState extends State<TodoEditForm> {
                   _addTagController.clear();
                 }
               },
-              child: Text('Add Tag')
+              child: Text('Add Tag', style: TextStyle(color: Colors.black),)
             )
           ],
         );
@@ -121,7 +125,7 @@ class _TodoEditFormState extends State<TodoEditForm> {
 
       // APPBAR showing title and save button
       appBar: AppBar(
-        title: Text('TodoList Selection'),
+        title: Text('TodoListSelection'),
         centerTitle: true,
         // Background color should be inherited from previous data
         backgroundColor: _isUrgent ? Colors.red[400] : Colors.teal[400],
@@ -168,7 +172,7 @@ class _TodoEditFormState extends State<TodoEditForm> {
 
       // BODY Editing Input Form
       body: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -182,7 +186,7 @@ class _TodoEditFormState extends State<TodoEditForm> {
               ),
             ),
             SizedBox(
-              height: 8,
+              height: 16,
             ),
 
             // Description TextField
@@ -196,7 +200,7 @@ class _TodoEditFormState extends State<TodoEditForm> {
               ),
             ),
             SizedBox(
-              height: 8,
+              height: 16,
             ),
 
             // Action Chips
@@ -240,7 +244,7 @@ class _TodoEditFormState extends State<TodoEditForm> {
                       ),
                     ],
                   ),
-                  onPressed: () => _toggleUrgency,
+                  onPressed: () => _toggleUrgency(),
                 ),
                 
                 // Tags
@@ -267,49 +271,35 @@ class _TodoEditFormState extends State<TodoEditForm> {
             ElevatedButton(
               onPressed: () => showDialog(
                 context: context,
-                builder: (BuildContext context) => Dialog(
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Text('Do you really want to delete this todo? (${widget.data.title})'),
-                          ),
-                          Row(
-                            children: [
-                              TextButton(
-                                onPressed: () => Navigator.pop(context),
-                                child: Text('Dismiss'),
-                              ),
-                              TextButton(
-                                onPressed: () {
-                                  FirestoreTodoCRUD()
-                                    .deleteTodo(widget.data.docID);
-                                  Navigator.pop(context);
-                                  Navigator.pop(context);
-                                  Navigator.pop(context);
-                                },
-                                child: Text('Delete'),
-                              )
-                            ],
-                          )
-                        ],
-                      ),
+                builder: (BuildContext context) => AlertDialog(
+                  title: Text('Delete ${widget.data.title}?'),
+                  content: Text('Do you really want to delete this todo? (${widget.data.title})'),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: Text('Dismiss', style: TextStyle(color: Colors.black),),
                     ),
-                  )
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.max,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.delete),
-                    Text('Delete Todo'),
+                    TextButton(
+                      onPressed: () {
+                        FirestoreTodoCRUD()
+                          .deleteTodo(widget.data.docID);
+                        Navigator.pop(context);
+                        Navigator.pop(context);
+                        Navigator.pop(context);
+                      },
+                      child: Text('Delete', style: TextStyle(color: Colors.red),),
+                    )
                   ],
                 ),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.max,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.delete, color: Colors.red),
+                  Text('Delete Todo', style: TextStyle(color: Colors.red),),
+                ],
+              ),
             ),
           ],
         ),
