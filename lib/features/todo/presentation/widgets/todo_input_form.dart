@@ -14,6 +14,9 @@ final firestoreTodoCRUD = FirestoreTodoCRUD();
 class _TodoInputFormState extends State<TodoInputForm> {
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
+  final TextEditingController _addTagController = TextEditingController();
+
+  final List<String> _tags = [];
 
   int? _deadline;
   Future<void> _selectDeadline() async {
@@ -49,20 +52,23 @@ class _TodoInputFormState extends State<TodoInputForm> {
         ),
         actions: [
           IconButton(
-            onPressed: _titleController.text.isEmpty 
-            ? () => ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Title cannot be empty')))
-            : () {
-              firestoreTodoCRUD.addTodo({
-                'title': _titleController.text,
-                'description': _descriptionController.text,
-                'deadline': _deadline,
-                'isDone': false,
-                'isUrgent': _isUrgent,
-                'timestamp': DateTime.now().millisecondsSinceEpoch,
-              });
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Todo added')));
-            },
+            onPressed: _titleController.text.isEmpty
+                ? () => ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Title cannot be empty')))
+                : () {
+                    firestoreTodoCRUD.addTodo({
+                      'title': _titleController.text,
+                      'description': _descriptionController.text,
+                      'deadline': _deadline,
+                      'isDone': false,
+                      'tags': _tags,
+                      'isUrgent': _isUrgent,
+                      'timestamp': DateTime.now().millisecondsSinceEpoch,
+                    });
+                    Navigator.pop(context);
+                    ScaffoldMessenger.of(context)
+                        .showSnackBar(SnackBar(content: Text('Todo added')));
+                  },
             icon: Icon(Icons.check),
           ),
         ],
@@ -140,7 +146,30 @@ class _TodoInputFormState extends State<TodoInputForm> {
                       Text('add tag'),
                     ],
                   ),
-                  onPressed: () {},
+                  onPressed: () => showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: Text('Add Tag'),
+                          content: TextField(
+                            controller: _addTagController,
+                            decoration: InputDecoration(
+                              border: OutlineInputBorder(),
+                            ),
+                          ),
+                          actions: [
+                            TextButton(
+                                onPressed: () => Navigator.pop(context),
+                                child: Text('Dismiss')),
+                            TextButton(
+                                onPressed: () {
+                                  _tags.add(_addTagController.text);
+                                  Navigator.pop(context);
+                                },
+                                child: Text('Add Tag'))
+                          ],
+                        );
+                      }),
                 ),
               ],
             ),

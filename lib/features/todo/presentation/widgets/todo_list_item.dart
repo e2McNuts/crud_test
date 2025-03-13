@@ -1,3 +1,4 @@
+
 import 'package:crud_test/data/services/firestore_todo_crud.dart';
 import 'package:crud_test/features/todo/presentation/widgets/todo_detailed_view.dart';
 import 'package:intl/intl.dart';
@@ -8,6 +9,7 @@ class TodoListItem extends StatefulWidget {
   final String title;
   final String? description;
   final int? deadline;
+  final List<String>? tags;
   final bool isDone;
   final bool isUrgent;
 
@@ -17,6 +19,7 @@ class TodoListItem extends StatefulWidget {
       required this.title,
       this.description,
       this.deadline,
+      this.tags,
       required this.isDone,
       required this.isUrgent});
 
@@ -36,6 +39,7 @@ class _TodoListItemState extends State<TodoListItem> {
               title: widget.title,
               description: widget.description,
               deadline: widget.deadline,
+              tags: widget.tags,
               isDone: widget.isDone,
               isUrgent: widget.isUrgent),
         ),
@@ -44,44 +48,76 @@ class _TodoListItemState extends State<TodoListItem> {
         color: widget.isUrgent ? Colors.red[200] : Colors.teal[200],
         child: Padding(
           padding: const EdgeInsets.all(16.0),
-          child: Row(
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          child: IntrinsicHeight(
+            child: Row(
+              children: [
+                Flexible(
+                  flex: 1,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        widget.title,
-                        style: TextStyle(
-                          fontSize: 24,
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            widget.title,
+                            style: TextStyle(
+                              fontSize: 24,
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          widget.isUrgent
+                              ? Icon(
+                                  Icons.flag,
+                                  color: Colors.red,
+                                )
+                              : Container(),
+                        ],
                       ),
-                      widget.isUrgent ? Icon(Icons.flag, color: Colors.red,) : Container(),
+                        widget.description == ''
+                            ? Container()
+                            : Text(
+                                widget.description!,
+                                style: TextStyle(
+                                    fontSize: 16, color: Colors.white),
+                              ),
+                              Wrap(children: [
+                        if (widget.deadline != null)
+                          Chip(
+                            label: Text(DateFormat('d.M.yyyy')
+                                .format(DateTime.fromMillisecondsSinceEpoch(
+                                    widget.deadline!))
+                                .toString()),
+                          ),
+                        widget.tags == null
+                          ?Container()
+                          :ListView.builder(itemCount: widget.tags!.length, itemBuilder: (BuildContext context, int index) => ListTile(
+                            title: Text(widget.tags![index].toString()),
+                          ))
+                      ]),
                     ],
                   ),
-                  widget.description == ''
-                    ? Container()
-                    : Text(
-                      widget.description!,
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.white
-                      ),
+                ),
+                VerticalDivider(
+                  color: Colors.white54,
+                  width: 32,
+                ),
+                Checkbox(
+                    value: widget.isDone,
+                    side: BorderSide(
+                      color: Colors.white,
                     ),
-                  if (widget.deadline != null)
-                    Chip(label: Text(DateFormat('d.M.yyyy').format(DateTime.fromMillisecondsSinceEpoch(widget.deadline!)).toString())),
-                ],
-              ),
-              Checkbox(value: widget.isDone, onChanged: (bool? value) {
-                FirestoreTodoCRUD().updateTodo(widget.docID, {
-                  'isDone': value,
-                });
-              }),
-            ],
+                    checkColor: Colors.white,
+                    activeColor: Colors.white54,
+                    onChanged: (bool? value) {
+                      FirestoreTodoCRUD().updateTodo(widget.docID, {
+                        'isDone': value,
+                      });
+                    }),
+              ],
+            ),
           ),
         ),
       ),

@@ -9,12 +9,6 @@ class TodoPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: const Text('Todos'),
-          centerTitle: true,
-          backgroundColor: Colors.lightGreen[500],
-          foregroundColor: Colors.white,
-        ),
         floatingActionButton: FloatingActionButton(
           onPressed: () {
             Navigator.push(
@@ -24,8 +18,8 @@ class TodoPage extends StatelessWidget {
               ),
             );
           },
-          backgroundColor: Colors.lightGreen[500],
           foregroundColor: Colors.white,
+          backgroundColor: Colors.blue[400],
           child: Icon(Icons.add),
         ),
         body: Expanded(
@@ -41,7 +35,7 @@ class TodoPage extends StatelessWidget {
                     itemCount: snapshot.data!.docs.length,
                     itemBuilder: (context, index) {
                       final doc = snapshot.data!.docs[index];
-                      return TodoListItem(docID: doc.id, title: doc['title'], description: doc['description'], deadline: doc['deadline'], isDone: doc['isDone'], isUrgent: doc['isUrgent']);
+                      return TodoListItem(docID: doc.id, title: doc['title'], description: doc['description'], deadline: doc['deadline'], tags: doc['tags'], isDone: doc['isDone'], isUrgent: doc['isUrgent']);
                     },
                   );
                 }
