@@ -1,25 +1,15 @@
+import 'package:crud_test/data/models/todo_model.dart';
 import 'package:crud_test/features/todo/presentation/widgets/todo_edit_form.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class TodoDetailedView extends StatefulWidget {
-  final String docID;
-  final String title;
-  final String? description;
-  final int? deadline;
-  final List<String>? tags;
-  final bool isDone;
-  final bool isUrgent;
+  final TodoModel data;
 
   const TodoDetailedView(
       {super.key,
-      required this.docID,
-      required this.title,
-      this.description,
-      this.deadline,
-      this.tags,
-      required this.isDone,
-      required this.isUrgent});
+      required this.data
+      });
 
   @override
   State<TodoDetailedView> createState() => _TodoDetailedViewState();
@@ -29,23 +19,18 @@ class _TodoDetailedViewState extends State<TodoDetailedView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: widget.isUrgent ? Colors.red[100] : Colors.teal[100],
+      backgroundColor: widget.data.isUrgent ? Colors.red[100] : Colors.teal[100],
       appBar: AppBar(
-        title: Text(widget.title),
+        title: Text(widget.data.title),
         centerTitle: true,
-        backgroundColor: widget.isUrgent ? Colors.red[400] : Colors.teal[400],
+        backgroundColor: widget.data.isUrgent ? Colors.red[400] : Colors.teal[400],
         foregroundColor: Colors.white,
         actions: [
           IconButton(
             onPressed: () => Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => TodoEditForm(
-                    docID: widget.docID,
-                    title: widget.title,
-                    description: widget.description,
-                    deadline: widget.deadline,
-                    isUrgent: widget.isUrgent),
+                builder: (context) => TodoEditForm(data: widget.data),
               ),
             ),
             icon: Icon(Icons.edit),
@@ -57,18 +42,21 @@ class _TodoDetailedViewState extends State<TodoDetailedView> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(widget.description!),
+            Text(widget.data.description!),
             SizedBox(
               height: 16,
             ),
-            Wrap(children: [
-              Chip(
-                label: Text(DateFormat('d.M.yyyy')
-                    .format(
-                        DateTime.fromMillisecondsSinceEpoch(widget.deadline!))
-                    .toString()),
-              )
-            ]),
+            Wrap(spacing: 4, runSpacing: -4, children: [
+                        if (widget.data.deadline != null)
+                          Chip(
+                            label: Text(DateFormat('d.M.yyyy')
+                                .format(DateTime.fromMillisecondsSinceEpoch(
+                                    widget.data.deadline!))
+                                .toString()),
+                          ),
+                        if (widget.data.tags != null)
+                          for (var tag in widget.data.tags!) Chip(label: Text(tag)),
+                      ]),
           ],
         ),
       ),

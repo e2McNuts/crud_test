@@ -1,21 +1,15 @@
+import 'package:crud_test/data/models/todo_model.dart';
 import 'package:crud_test/data/services/firestore_todo_crud.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class TodoEditForm extends StatefulWidget {
-  final String docID;
-  final String title;
-  final String? description;
-  final int? deadline;
-  final bool isUrgent;
+  final TodoModel data;
 
   const TodoEditForm(
       {super.key,
-      required this.docID,
-      required this.title,
-      this.description,
-      this.deadline,
-      required this.isUrgent});
+      required this.data
+      });
 
   @override
   State<TodoEditForm> createState() => _TodoEditFormState();
@@ -30,18 +24,18 @@ class _TodoEditFormState extends State<TodoEditForm> {
   @override
   void initState() {
     super.initState();
-    _titleController = TextEditingController(text: widget.title);
-    _descriptionController = TextEditingController(text: widget.description);
-    _deadline = widget.deadline;
-    _isUrgent = widget.isUrgent;
+    _titleController = TextEditingController(text: widget.data.title);
+    _descriptionController = TextEditingController(text: widget.data.description);
+    _deadline = widget.data.deadline;
+    _isUrgent = widget.data.isUrgent;
   }
 
   Future<void> _selectDeadline() async {
     final DateTime? pickedDate = await showDatePicker(
       context: context,
-      initialDate: widget.deadline == null
+      initialDate: widget.data.deadline == null
           ? DateTime.now()
-          : DateTime.fromMillisecondsSinceEpoch(widget.deadline!),
+          : DateTime.fromMillisecondsSinceEpoch(widget.data.deadline!),
       firstDate: DateTime.now().add(const Duration(days: -14)),
       lastDate: DateTime.now().add(const Duration(days: 365 * 10)),
     );
@@ -60,7 +54,7 @@ class _TodoEditFormState extends State<TodoEditForm> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
+        title: Text(widget.data.title),
         centerTitle: true,
         backgroundColor: Colors.lightGreen[500],
         foregroundColor: Colors.white,
@@ -71,10 +65,11 @@ class _TodoEditFormState extends State<TodoEditForm> {
         actions: [
           IconButton(
               onPressed: () {
-                FirestoreTodoCRUD().updateTodo(widget.docID, {
+                FirestoreTodoCRUD().updateTodo(widget.data.docID, {
                   'title': _titleController.text,
                   'description': _descriptionController.text,
                   'deadline': _deadline,
+                  'tags': widget.data.tags,
                   'isUrgent': _isUrgent,
                   'timestamp': DateTime.now().millisecondsSinceEpoch,
                 });
@@ -149,6 +144,8 @@ class _TodoEditFormState extends State<TodoEditForm> {
                   ),
                   onPressed: () => _toggleUrgency(),
                 ),
+                if (widget.data.tags != null)
+                          for (var tag in widget.data.tags!) Chip(label: Text(tag)),
                 ActionChip(
                   label: Row(
                     mainAxisSize: MainAxisSize.min,
@@ -178,7 +175,7 @@ class _TodoEditFormState extends State<TodoEditForm> {
                               Padding(
                                 padding: const EdgeInsets.all(8.0),
                                 child: Text(
-                                    'Do you really want to delete this todo? (${widget.title})'),
+                                    'Do you really want to delete this todo? (${widget.data.title})'),
                               ),
                               Row(
                                 children: [
@@ -189,7 +186,7 @@ class _TodoEditFormState extends State<TodoEditForm> {
                                   TextButton(
                                     onPressed: () {
                                       FirestoreTodoCRUD()
-                                          .deleteTodo(widget.docID);
+                                          .deleteTodo(widget.data.docID);
                                       Navigator.pop(context);
                                       Navigator.pop(context);
                                       Navigator.pop(context);

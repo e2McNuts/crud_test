@@ -1,3 +1,4 @@
+import 'package:crud_test/data/models/todo_model.dart';
 import 'package:crud_test/data/services/firestore_todo_crud.dart';
 import 'package:crud_test/features/todo/presentation/widgets/todo_input_form.dart';
 import 'package:crud_test/features/todo/presentation/widgets/todo_list_item.dart';
@@ -34,8 +35,16 @@ class TodoPage extends StatelessWidget {
                   return ListView.builder(
                     itemCount: snapshot.data!.docs.length,
                     itemBuilder: (context, index) {
-                      final doc = snapshot.data!.docs[index];
-                      return TodoListItem(docID: doc.id, title: doc['title'], description: doc['description'], deadline: doc['deadline'], tags: doc['tags'], isDone: doc['isDone'], isUrgent: doc['isUrgent']);
+                      final TodoModel data = TodoModel(
+                        docID: snapshot.data!.docs[index].id,
+                        title: snapshot.data!.docs[index]['title'],
+                        description: snapshot.data!.docs[index]['description'],
+                        deadline: snapshot.data!.docs[index]['deadline'],
+                        tags: snapshot.data!.docs[index]['tags'],
+                        isDone: snapshot.data!.docs[index]['isDone'],
+                        isUrgent: snapshot.data!.docs[index]['isUrgent'],
+                      );
+                      return TodoListItem(data: data);
                     },
                   );
                 }

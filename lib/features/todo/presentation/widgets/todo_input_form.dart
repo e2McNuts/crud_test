@@ -138,6 +138,7 @@ class _TodoInputFormState extends State<TodoInputForm> {
                   ),
                   onPressed: () => _toggleUrgency(),
                 ),
+                for (var tag in _tags) Chip(label: Text(tag)),
                 ActionChip(
                   label: Row(
                     mainAxisSize: MainAxisSize.min,
@@ -159,12 +160,16 @@ class _TodoInputFormState extends State<TodoInputForm> {
                           ),
                           actions: [
                             TextButton(
-                                onPressed: () => Navigator.pop(context),
+                                onPressed: () { 
+                                  Navigator.pop(context);
+                                  _addTagController.clear();
+                                },
                                 child: Text('Dismiss')),
                             TextButton(
                                 onPressed: () {
                                   _tags.add(_addTagController.text);
                                   Navigator.pop(context);
+                                  _addTagController.clear();
                                 },
                                 child: Text('Add Tag'))
                           ],

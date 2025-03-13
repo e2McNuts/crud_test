@@ -1,27 +1,15 @@
-
+import 'package:crud_test/data/models/todo_model.dart';
 import 'package:crud_test/data/services/firestore_todo_crud.dart';
 import 'package:crud_test/features/todo/presentation/widgets/todo_detailed_view.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 
 class TodoListItem extends StatefulWidget {
-  final String docID;
-  final String title;
-  final String? description;
-  final int? deadline;
-  final List<String>? tags;
-  final bool isDone;
-  final bool isUrgent;
+  final TodoModel data;
 
   const TodoListItem(
       {super.key,
-      required this.docID,
-      required this.title,
-      this.description,
-      this.deadline,
-      this.tags,
-      required this.isDone,
-      required this.isUrgent});
+      required this.data});
 
   @override
   State<TodoListItem> createState() => _TodoListItemState();
@@ -34,18 +22,11 @@ class _TodoListItemState extends State<TodoListItem> {
       onDoubleTap: () => Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => TodoDetailedView(
-              docID: widget.docID,
-              title: widget.title,
-              description: widget.description,
-              deadline: widget.deadline,
-              tags: widget.tags,
-              isDone: widget.isDone,
-              isUrgent: widget.isUrgent),
+          builder: (context) => TodoDetailedView(data: widget.data),
         ),
       ),
       child: Card(
-        color: widget.isUrgent ? Colors.red[200] : Colors.teal[200],
+        color: widget.data.isUrgent ? Colors.red[200] : Colors.teal[200],
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: IntrinsicHeight(
@@ -61,14 +42,14 @@ class _TodoListItemState extends State<TodoListItem> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            widget.title,
+                            widget.data.title,
                             style: TextStyle(
                               fontSize: 24,
                               color: Colors.white,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          widget.isUrgent
+                          widget.data.isUrgent
                               ? Icon(
                                   Icons.flag,
                                   color: Colors.red,
@@ -76,26 +57,23 @@ class _TodoListItemState extends State<TodoListItem> {
                               : Container(),
                         ],
                       ),
-                        widget.description == ''
-                            ? Container()
-                            : Text(
-                                widget.description!,
-                                style: TextStyle(
-                                    fontSize: 16, color: Colors.white),
-                              ),
-                              Wrap(children: [
-                        if (widget.deadline != null)
+                      widget.data.description == ''
+                          ? Container()
+                          : Text(
+                              widget.data.description!,
+                              style:
+                                  TextStyle(fontSize: 16, color: Colors.white),
+                            ),
+                      Wrap(spacing: 4, runSpacing: -4, children: [
+                        if (widget.data.deadline != null)
                           Chip(
                             label: Text(DateFormat('d.M.yyyy')
                                 .format(DateTime.fromMillisecondsSinceEpoch(
-                                    widget.deadline!))
+                                    widget.data.deadline!))
                                 .toString()),
                           ),
-                        widget.tags == null
-                          ?Container()
-                          :ListView.builder(itemCount: widget.tags!.length, itemBuilder: (BuildContext context, int index) => ListTile(
-                            title: Text(widget.tags![index].toString()),
-                          ))
+                        if (widget.data.tags != null)
+                          for (var tag in widget.data.tags!) Chip(label: Text(tag)),
                       ]),
                     ],
                   ),
@@ -105,14 +83,14 @@ class _TodoListItemState extends State<TodoListItem> {
                   width: 32,
                 ),
                 Checkbox(
-                    value: widget.isDone,
+                    value: widget.data.isDone,
                     side: BorderSide(
                       color: Colors.white,
                     ),
                     checkColor: Colors.white,
                     activeColor: Colors.white54,
                     onChanged: (bool? value) {
-                      FirestoreTodoCRUD().updateTodo(widget.docID, {
+                      FirestoreTodoCRUD().updateTodo(widget.data.docID, {
                         'isDone': value,
                       });
                     }),
