@@ -201,8 +201,8 @@ class _TodoEditFormState extends State<TodoEditForm> {
 
             // Action Chips
             Wrap(
-              runSpacing: 8,
-              spacing: 8,
+              runSpacing: -4,
+              spacing: 4,
               children: [
 
                 // Deadline
