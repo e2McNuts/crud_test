@@ -6,10 +6,7 @@ import 'package:intl/intl.dart';
 class TodoDetailedView extends StatefulWidget {
   final TodoModel data;
 
-  const TodoDetailedView(
-      {super.key,
-      required this.data
-      });
+  const TodoDetailedView({super.key, required this.data});
 
   @override
   State<TodoDetailedView> createState() => _TodoDetailedViewState();
@@ -19,13 +16,18 @@ class _TodoDetailedViewState extends State<TodoDetailedView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: widget.data.isUrgent ? Colors.red[100] : Colors.teal[100],
+      backgroundColor:
+        widget.data.isUrgent ? Colors.red[100] : Colors.teal[100],
+      
+      // APPBAR Showing title, inheriting color from data
       appBar: AppBar(
         title: Text(widget.data.title),
         centerTitle: true,
-        backgroundColor: widget.data.isUrgent ? Colors.red[400] : Colors.teal[400],
+        backgroundColor:
+          widget.data.isUrgent ? Colors.red[400] : Colors.teal[400],
         foregroundColor: Colors.white,
         actions: [
+          // EDIT BUTTON
           IconButton(
             onPressed: () => Navigator.push(
               context,
@@ -37,26 +39,35 @@ class _TodoDetailedViewState extends State<TodoDetailedView> {
           ),
         ],
       ),
+
+      // BODY Showing Todo data
       body: Padding(
         padding: EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Description
             Text(widget.data.description!),
+
             SizedBox(
               height: 16,
             ),
+
+            // Deadline and Tags
             Wrap(spacing: 4, runSpacing: -4, children: [
-                        if (widget.data.deadline != null)
-                          Chip(
-                            label: Text(DateFormat('d.M.yyyy')
-                                .format(DateTime.fromMillisecondsSinceEpoch(
-                                    widget.data.deadline!))
-                                .toString()),
-                          ),
-                        if (widget.data.tags != null)
-                          for (var tag in widget.data.tags!) Chip(label: Text(tag)),
-                      ]),
+              // Deadline
+              if (widget.data.deadline != null)
+                Chip(
+                  label: Text(DateFormat('d.M.yyyy')
+                      .format(DateTime.fromMillisecondsSinceEpoch(
+                          widget.data.deadline!))
+                      .toString()),
+                ),
+              
+              // Tags
+              if (widget.data.tags != null)
+                for (var tag in widget.data.tags!) Chip(label: Text(tag)),
+            ]),
           ],
         ),
       ),

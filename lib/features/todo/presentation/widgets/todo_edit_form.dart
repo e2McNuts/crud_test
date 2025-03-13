@@ -6,30 +6,33 @@ import 'package:intl/intl.dart';
 class TodoEditForm extends StatefulWidget {
   final TodoModel data;
 
-  const TodoEditForm(
-      {super.key,
-      required this.data
-      });
+  const TodoEditForm({super.key, required this.data});
 
   @override
   State<TodoEditForm> createState() => _TodoEditFormState();
 }
 
 class _TodoEditFormState extends State<TodoEditForm> {
+  // TextInput Controllers
   late TextEditingController _titleController;
   late TextEditingController _descriptionController;
+
+  // Deadline and Urgency
   late int? _deadline;
   late bool _isUrgent;
 
+  // Write existing data to controllers
   @override
   void initState() {
     super.initState();
     _titleController = TextEditingController(text: widget.data.title);
-    _descriptionController = TextEditingController(text: widget.data.description);
+    _descriptionController =
+        TextEditingController(text: widget.data.description);
     _deadline = widget.data.deadline;
     _isUrgent = widget.data.isUrgent;
   }
 
+  // Deadline Selector converting to DateTime to Timestamp int
   Future<void> _selectDeadline() async {
     final DateTime? pickedDate = await showDatePicker(
       context: context,
@@ -44,6 +47,7 @@ class _TodoEditFormState extends State<TodoEditForm> {
     });
   }
 
+  // Urgency Toggle
   void _toggleUrgency() {
     setState(() {
       _isUrgent = !_isUrgent;
@@ -53,30 +57,38 @@ class _TodoEditFormState extends State<TodoEditForm> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+
+      // APPBAR showing title and save button
       appBar: AppBar(
         title: Text(widget.data.title),
         centerTitle: true,
-        backgroundColor: Colors.lightGreen[500],
+        // Background color should be inherited from previous data
+        backgroundColor: _isUrgent ? Colors.red[400] : Colors.teal[400],
         foregroundColor: Colors.white,
+        
+        // Cancel Button
         leading: IconButton(
           onPressed: () => Navigator.pop(context),
           icon: Icon(Icons.close),
         ),
+
+        // Save Button
         actions: [
           IconButton(
-              onPressed: () {
-                FirestoreTodoCRUD().updateTodo(widget.data.docID, {
-                  'title': _titleController.text,
-                  'description': _descriptionController.text,
-                  'deadline': _deadline,
-                  'tags': widget.data.tags,
-                  'isUrgent': _isUrgent,
-                  'timestamp': DateTime.now().millisecondsSinceEpoch,
+            onPressed: () {
+              FirestoreTodoCRUD().updateTodo(widget.data.docID, {
+                'title': _titleController.text,
+                'description': _descriptionController.text,
+                'deadline': _deadline,
+                'tags': widget.data.tags,
+                'isUrgent': _isUrgent,                  
+                'timestamp': DateTime.now().millisecondsSinceEpoch,
                 });
-                Navigator.pop(context);
-                Navigator.pop(context);
-              },
-              icon: Icon(Icons.save))
+              Navigator.pop(context);
+              Navigator.pop(context);
+            },
+            icon: Icon(Icons.save)
+          )
         ],
       ),
       body: Padding(
@@ -145,7 +157,7 @@ class _TodoEditFormState extends State<TodoEditForm> {
                   onPressed: () => _toggleUrgency(),
                 ),
                 if (widget.data.tags != null)
-                          for (var tag in widget.data.tags!) Chip(label: Text(tag)),
+                  for (var tag in widget.data.tags!) Chip(label: Text(tag)),
                 ActionChip(
                   label: Row(
                     mainAxisSize: MainAxisSize.min,
