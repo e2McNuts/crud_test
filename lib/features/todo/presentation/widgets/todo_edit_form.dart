@@ -12,9 +12,6 @@ class TodoEditForm extends StatefulWidget {
   State<TodoEditForm> createState() => _TodoEditFormState();
 }
 
-// Title can be null. please fix 
-// Dismiss Tag cant be null. please fix
-
 class _TodoEditFormState extends State<TodoEditForm> {
   
   // TextInput Controllers
@@ -26,8 +23,8 @@ class _TodoEditFormState extends State<TodoEditForm> {
   // Handling of Tags
   late List<String> _tags;
 
-  Future<void> _addTag() async {
-    final String newTag = await showDialog(
+  _addTag() async {
+    final newTag = await showDialog<String>(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
@@ -48,8 +45,14 @@ class _TodoEditFormState extends State<TodoEditForm> {
             ),
             TextButton(
               onPressed: () {
-                Navigator.pop(context, _addTagController.text);
-                _addTagController.clear();
+                if (_addTagController.text.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Tag cannot be empty'))
+                  );
+                } else {
+                  Navigator.pop(context, _addTagController.text);
+                  _addTagController.clear();
+                }
               },
               child: Text('Add Tag')
             )
@@ -57,9 +60,12 @@ class _TodoEditFormState extends State<TodoEditForm> {
         );
       },
     );
-    setState(() {
-      _tags.add(newTag);
-    });
+
+    if (newTag != null && newTag.isNotEmpty) {
+      setState(() {
+        _tags.add(newTag);
+      });
+    }
   }
 
   Future<void> _removeTag(String tag) async {
@@ -129,21 +135,34 @@ class _TodoEditFormState extends State<TodoEditForm> {
 
         // Save Button | UPDATING TO FIREBASE
         actions: [
-          IconButton(
-            onPressed: () {
-              FirestoreTodoCRUD().updateTodo(widget.data.docID, {
-                'title': _titleController.text,
-                'description': _descriptionController.text,
-                'deadline': _deadline,
-                'tags': widget.data.tags,
-                'isUrgent': _isUrgent,                  
-                'timestamp': DateTime.now().millisecondsSinceEpoch,
-                });
-              Navigator.pop(context);
-              Navigator.pop(context);
+          ValueListenableBuilder<TextEditingValue>(
+            valueListenable: _titleController,
+            builder: (context, value, child) {
+              return IconButton(
+                onPressed: value.text.isEmpty
+                  ? () => ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Title cannot be empty')))
+                  : () {
+                    FirestoreTodoCRUD().updateTodo(
+                      widget.data.docID,
+                      {
+                        'title': _titleController.text,
+                        'description': _descriptionController.text,
+                        'deadline': _deadline,
+                        'tags': widget.data.tags,
+                        'isUrgent': _isUrgent,                  
+                        'timestamp': DateTime.now().millisecondsSinceEpoch,
+                      }
+                    );
+                      Navigator.pop(context);
+                      Navigator.pop(context);
+                      ScaffoldMessenger.of(context)
+                        .showSnackBar(SnackBar(content: Text('Todo added')));
+                  },
+                icon: Icon(Icons.check),
+              );
             },
-            icon: Icon(Icons.save)
-          )
+          ),
         ],
       ),
 

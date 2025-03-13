@@ -11,9 +11,6 @@ class TodoInputForm extends StatefulWidget {
 
 class _TodoInputFormState extends State<TodoInputForm> {
 
-  // Firestore CRUD
-  final firestoreTodoCRUD = FirestoreTodoCRUD();
-
   // TextInput Controllers
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
@@ -23,8 +20,8 @@ class _TodoInputFormState extends State<TodoInputForm> {
   // Handling of Tags
   final List<String> _tags = [];
 
-  Future<void> _addTag() async {
-    final String newTag = await showDialog(
+  _addTag() async {
+    final newTag = await showDialog<String>(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
@@ -45,8 +42,14 @@ class _TodoInputFormState extends State<TodoInputForm> {
             ),
             TextButton(
               onPressed: () {
-                Navigator.pop(context, _addTagController.text);
-                _addTagController.clear();
+                if (_addTagController.text.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Tag cannot be empty'))
+                  );
+                } else {
+                  Navigator.pop(context, _addTagController.text);
+                  _addTagController.clear();
+                }
               },
               child: Text('Add Tag')
             )
@@ -54,9 +57,12 @@ class _TodoInputFormState extends State<TodoInputForm> {
         );
       },
     );
-    setState(() {
+
+    if (newTag != null && newTag.isNotEmpty) {
+      setState(() {
         _tags.add(newTag);
-    });
+      });
+    }
   }
 
   Future<void> _removeTag(String tag) async {
@@ -120,7 +126,7 @@ class _TodoInputFormState extends State<TodoInputForm> {
                   ? () => ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text('Title cannot be empty')))
                   : () {
-                    firestoreTodoCRUD.addTodo({
+                    FirestoreTodoCRUD().addTodo({
                       'title': _titleController.text,
                       'description': _descriptionController.text,
                       'deadline': _deadline,
