@@ -9,16 +9,66 @@ class TodoInputForm extends StatefulWidget {
   State<TodoInputForm> createState() => _TodoInputFormState();
 }
 
-final firestoreTodoCRUD = FirestoreTodoCRUD();
-
 class _TodoInputFormState extends State<TodoInputForm> {
+
+  // Firestore CRUD
+  final firestoreTodoCRUD = FirestoreTodoCRUD();
+
+  // TextInput Controllers
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
   final TextEditingController _addTagController = TextEditingController();
 
+
+  // Handling of Tags
   final List<String> _tags = [];
 
+  Future<void> _addTag() async {
+    final String newTag = await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Add Tag'),
+          content: TextField(
+            controller: _addTagController,
+            decoration: InputDecoration(
+              border: OutlineInputBorder(),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+                _addTagController.clear();
+              },
+              child: Text('Dismiss')
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context, _addTagController.text);
+                _addTagController.clear();
+              },
+              child: Text('Add Tag')
+            )
+          ],
+        );
+      },
+    );
+    setState(() {
+        _tags.add(newTag);
+    });
+  }
+
+  Future<void> _removeTag(String tag) async {
+    setState(() {
+      _tags.remove(tag);
+    });
+  }
+
+
+  // Handling of Deadline
   int? _deadline;
+
   Future<void> _selectDeadline() async {
     final DateTime? pickedDate = await showDatePicker(
       context: context,
@@ -31,31 +81,45 @@ class _TodoInputFormState extends State<TodoInputForm> {
     });
   }
 
+
+  // Handling of Urgency
   bool _isUrgent = false;
+
   void _toggleUrgency() {
     setState(() {
       _isUrgent = !_isUrgent;
     });
   }
 
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+
+      // APPBAR showing TodoList, save and cancel button
       appBar: AppBar(
-        title: Text('todolist'),
+        title: Text('TodoListSelection'),// Still to be implemented
         centerTitle: true,
-        backgroundColor: Colors.lightGreen[500],
+        // color is standard or red for urgent -> changing with the TodoList
+        backgroundColor: _isUrgent == false ?Colors.blue[400] :Colors.red[400],
         foregroundColor: Colors.white,
+
+        // Cancel Button
         leading: IconButton(
           onPressed: () => Navigator.pop(context),
           icon: Icon(Icons.close),
         ),
+
+        // Save Button
         actions: [
-          IconButton(
-            onPressed: _titleController.text.isEmpty
-                ? () => ScaffoldMessenger.of(context).showSnackBar(
+          ValueListenableBuilder<TextEditingValue>(
+            valueListenable: _titleController,
+            builder: (context, value, child) {
+              return IconButton(
+                onPressed: value.text.isEmpty
+                  ? () => ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text('Title cannot be empty')))
-                : () {
+                  : () {
                     firestoreTodoCRUD.addTodo({
                       'title': _titleController.text,
                       'description': _descriptionController.text,
@@ -65,19 +129,25 @@ class _TodoInputFormState extends State<TodoInputForm> {
                       'isUrgent': _isUrgent,
                       'timestamp': DateTime.now().millisecondsSinceEpoch,
                     });
-                    Navigator.pop(context);
-                    ScaffoldMessenger.of(context)
+                      Navigator.pop(context);
+                      ScaffoldMessenger.of(context)
                         .showSnackBar(SnackBar(content: Text('Todo added')));
                   },
-            icon: Icon(Icons.check),
+                icon: Icon(Icons.check),
+              );
+            },
           ),
         ],
       ),
+
+      // Input Form
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+
+            // Title TextField
             TextField(
               controller: _titleController,
               decoration: InputDecoration(
@@ -88,6 +158,8 @@ class _TodoInputFormState extends State<TodoInputForm> {
             SizedBox(
               height: 8,
             ),
+
+            // Description TextField
             TextField(
               controller: _descriptionController,
               minLines: 1,
@@ -100,25 +172,32 @@ class _TodoInputFormState extends State<TodoInputForm> {
             SizedBox(
               height: 8,
             ),
+
+            // Deadline, Urgency and Tags
             Wrap(
               runSpacing: 8,
               spacing: 8,
               children: [
+
+                // Deadline
                 ActionChip(
                   label: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Icon(Icons.calendar_month),
                       _deadline == null
-                          ? Text(' add deadline')
-                          : Text(DateFormat('d.M.yyyy')
-                              .format(DateTime.fromMillisecondsSinceEpoch(
-                                  _deadline!))
-                              .toString()),
+                        ? Text(' add deadline')
+                        : Text(DateFormat('d.M.yyyy')
+                            .format(DateTime.fromMillisecondsSinceEpoch(
+                                _deadline!))
+                            .toString()
+                        ),
                     ],
                   ),
                   onPressed: _selectDeadline,
                 ),
+
+                // Urgency
                 ActionChip(
                   backgroundColor: _isUrgent ? Colors.red[600] : null,
                   label: Row(
@@ -138,7 +217,11 @@ class _TodoInputFormState extends State<TodoInputForm> {
                   ),
                   onPressed: () => _toggleUrgency(),
                 ),
-                for (var tag in _tags) Chip(label: Text(tag)),
+
+                // Tags
+                for (var tag in _tags) Chip(label: Text(tag), onDeleted: () => _removeTag(tag)),
+
+                // Add Tag
                 ActionChip(
                   label: Row(
                     mainAxisSize: MainAxisSize.min,
@@ -147,34 +230,7 @@ class _TodoInputFormState extends State<TodoInputForm> {
                       Text('add tag'),
                     ],
                   ),
-                  onPressed: () => showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return AlertDialog(
-                          title: Text('Add Tag'),
-                          content: TextField(
-                            controller: _addTagController,
-                            decoration: InputDecoration(
-                              border: OutlineInputBorder(),
-                            ),
-                          ),
-                          actions: [
-                            TextButton(
-                                onPressed: () { 
-                                  Navigator.pop(context);
-                                  _addTagController.clear();
-                                },
-                                child: Text('Dismiss')),
-                            TextButton(
-                                onPressed: () {
-                                  _tags.add(_addTagController.text);
-                                  Navigator.pop(context);
-                                  _addTagController.clear();
-                                },
-                                child: Text('Add Tag'))
-                          ],
-                        );
-                      }),
+                  onPressed: _addTag,
                 ),
               ],
             ),
