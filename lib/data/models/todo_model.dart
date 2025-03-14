@@ -1,5 +1,6 @@
 class TodoModel {
   final String docID;
+  final String todoList;
   final String title;
   final String? description;
   final int? deadline;
@@ -9,6 +10,7 @@ class TodoModel {
 
   TodoModel({
     required this.docID,
+    required this.todoList,
     required this.title,
     this.description,
     this.deadline,

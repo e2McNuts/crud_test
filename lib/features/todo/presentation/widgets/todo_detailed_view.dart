@@ -21,7 +21,7 @@ class _TodoDetailedViewState extends State<TodoDetailedView> {
       
       // APPBAR Showing title, inheriting color from data
       appBar: AppBar(
-        title: Text('TodoList1'),
+        title: Text('@${widget.data.todoList}'),
         centerTitle: true,
         backgroundColor:
           widget.data.isUrgent ? Colors.red[400] : Colors.teal[400],

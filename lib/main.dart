@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'features/settings/presentation/pages/settings_page.dart';
 import 'features/todo/presentation/pages/todo_page.dart';
 import 'firebase_options.dart';
 
@@ -11,14 +12,39 @@ void main() async {
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
   @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+
+int index = 0;
+
+final screens = [
+  TodoPage(),
+  SettingsPage()
+];
+
+  @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: TodoPage(),
+      home: Scaffold(
+        bottomNavigationBar: NavigationBar(
+          selectedIndex: index,
+          onDestinationSelected: (index) => setState(() {
+            this.index = index;
+          }),
+          destinations: [
+            NavigationDestination(icon: Icon(Icons.list), label: 'Todos'),
+            NavigationDestination(icon: Icon(Icons.settings), label: 'Settings')
+          ],
+        ),
+        body: screens[index],
+      ),
     );
   }
 }

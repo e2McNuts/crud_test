@@ -10,12 +10,10 @@ class TodoInputForm extends StatefulWidget {
 }
 
 class _TodoInputFormState extends State<TodoInputForm> {
-
   // TextInput Controllers
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
   final TextEditingController _addTagController = TextEditingController();
-
 
   // Handling of Tags
   final List<String> _tags = [];
@@ -34,25 +32,22 @@ class _TodoInputFormState extends State<TodoInputForm> {
           ),
           actions: [
             TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-                _addTagController.clear();
-              },
-              child: Text('Dismiss')
-            ),
-            TextButton(
-              onPressed: () {
-                if (_addTagController.text.isEmpty) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Tag cannot be empty'))
-                  );
-                } else {
-                  Navigator.pop(context, _addTagController.text);
+                onPressed: () {
+                  Navigator.pop(context);
                   _addTagController.clear();
-                }
-              },
-              child: Text('Add Tag')
-            )
+                },
+                child: Text('Dismiss')),
+            TextButton(
+                onPressed: () {
+                  if (_addTagController.text.isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Tag cannot be empty')));
+                  } else {
+                    Navigator.pop(context, _addTagController.text);
+                    _addTagController.clear();
+                  }
+                },
+                child: Text('Add Tag'))
           ],
         );
       },
@@ -71,7 +66,6 @@ class _TodoInputFormState extends State<TodoInputForm> {
     });
   }
 
-
   // Handling of Deadline
   int? _deadline;
 
@@ -87,7 +81,6 @@ class _TodoInputFormState extends State<TodoInputForm> {
     });
   }
 
-
   // Handling of Urgency
   bool _isUrgent = false;
 
@@ -97,17 +90,51 @@ class _TodoInputFormState extends State<TodoInputForm> {
     });
   }
 
+  final List<String> _todoLists = [
+    "TodoList01",
+    "TodoList2",
+    "TodoList3",
+    "TodoList4"
+  ];
+
+  late String _selectedTodoList;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedTodoList = _todoLists[0];
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-
       // APPBAR showing TodoList, save and cancel button
       appBar: AppBar(
-        title: Text('TodoListSelection'),// Still to be implemented
+        title: GestureDetector(
+          onTap: () => showMenu(
+            context: context,
+            position: RelativeRect.fromLTRB(100, 70, 100, 0),
+            items: [
+              for (var todoList in _todoLists) PopupMenuItem(
+                enabled: _selectedTodoList != todoList,
+                onTap: () => setState(() {_selectedTodoList = todoList;}),
+                child: Text(todoList)
+              ),
+              PopupMenuItem(height: 0, child: PopupMenuDivider(height: 4,),),
+              PopupMenuItem(
+                child: Text('Add Todo List')
+              ),
+            ]
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [Text(_selectedTodoList), Icon(Icons.arrow_drop_down)],
+          ),
+        ),
         centerTitle: true,
         // color is standard or red for urgent -> changing with the TodoList
-        backgroundColor: _isUrgent == false ?Colors.blue[400] :Colors.red[400],
+        backgroundColor:
+            _isUrgent == false ? Colors.blue[400] : Colors.red[400],
         foregroundColor: Colors.white,
 
         // Cancel Button
@@ -123,22 +150,23 @@ class _TodoInputFormState extends State<TodoInputForm> {
             builder: (context, value, child) {
               return IconButton(
                 onPressed: value.text.isEmpty
-                  ? () => ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Title cannot be empty')))
-                  : () {
-                    FirestoreTodoCRUD().addTodo({
-                      'title': _titleController.text,
-                      'description': _descriptionController.text,
-                      'deadline': _deadline,
-                      'isDone': false,
-                      'tags': _tags,
-                      'isUrgent': _isUrgent,
-                      'timestamp': DateTime.now().millisecondsSinceEpoch,
-                    });
-                      Navigator.pop(context);
-                      ScaffoldMessenger.of(context)
-                        .showSnackBar(SnackBar(content: Text('Todo added')));
-                  },
+                    ? () => ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Title cannot be empty')))
+                    : () {
+                        FirestoreTodoCRUD().addTodo({
+                          'title': _titleController.text,
+                          'todoList': _selectedTodoList,
+                          'description': _descriptionController.text,
+                          'deadline': _deadline,
+                          'isDone': false,
+                          'tags': _tags,
+                          'isUrgent': _isUrgent,
+                          'timestamp': DateTime.now().millisecondsSinceEpoch,
+                        });
+                        Navigator.pop(context);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('Todo added')));
+                      },
                 icon: Icon(Icons.check),
               );
             },
@@ -152,7 +180,6 @@ class _TodoInputFormState extends State<TodoInputForm> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-
             // Title TextField
             TextField(
               controller: _titleController,
@@ -184,7 +211,6 @@ class _TodoInputFormState extends State<TodoInputForm> {
               runSpacing: -4,
               spacing: 4,
               children: [
-
                 // Deadline
                 ActionChip(
                   label: Row(
@@ -192,12 +218,11 @@ class _TodoInputFormState extends State<TodoInputForm> {
                     children: [
                       Icon(Icons.calendar_month),
                       _deadline == null
-                        ? Text(' add deadline')
-                        : Text(DateFormat('d.M.yyyy')
-                            .format(DateTime.fromMillisecondsSinceEpoch(
-                                _deadline!))
-                            .toString()
-                        ),
+                          ? Text(' add deadline')
+                          : Text(DateFormat('d.M.yyyy')
+                              .format(DateTime.fromMillisecondsSinceEpoch(
+                                  _deadline!))
+                              .toString()),
                     ],
                   ),
                   onPressed: _selectDeadline,
@@ -225,7 +250,8 @@ class _TodoInputFormState extends State<TodoInputForm> {
                 ),
 
                 // Tags
-                for (var tag in _tags) Chip(label: Text(tag), onDeleted: () => _removeTag(tag)),
+                for (var tag in _tags)
+                  Chip(label: Text(tag), onDeleted: () => _removeTag(tag)),
 
                 // Add Tag
                 ActionChip(

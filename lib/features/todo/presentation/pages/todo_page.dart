@@ -47,6 +47,7 @@ class TodoPage extends StatelessWidget {
                     // parsing the server data to TodoModel
                     final TodoModel data = TodoModel(
                       docID: snapshot.data!.docs[index].id,
+                      todoList: snapshot.data!.docs[index]['todoList'],
                       title: snapshot.data!.docs[index]['title'],
                       description: snapshot.data!.docs[index]['description'],
                       deadline: snapshot.data!.docs[index]['deadline'],

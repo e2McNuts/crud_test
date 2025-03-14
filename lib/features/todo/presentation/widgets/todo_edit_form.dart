@@ -107,6 +107,15 @@ class _TodoEditFormState extends State<TodoEditForm> {
   }
 
 
+  final List<String> _todoLists = [
+    "TodoList01",
+    "TodoList2",
+    "TodoList3",
+    "TodoList4"
+  ];
+  late String _selectedTodoList;
+
+
   // Write existing data to controllers
   @override
   void initState() {
@@ -116,6 +125,7 @@ class _TodoEditFormState extends State<TodoEditForm> {
     _deadline = widget.data.deadline;
     _isUrgent = widget.data.isUrgent;
     _tags = widget.data.tags?.cast<String>().toList() ?? [];
+    _selectedTodoList = widget.data.todoList;
   }
 
 
@@ -125,7 +135,27 @@ class _TodoEditFormState extends State<TodoEditForm> {
 
       // APPBAR showing title and save button
       appBar: AppBar(
-        title: Text('TodoListSelection'),
+        title: GestureDetector(
+          onTap: () => showMenu(
+            context: context,
+            position: RelativeRect.fromLTRB(100, 70, 100, 0),
+            items: [
+              for (var todoList in _todoLists) PopupMenuItem(
+                enabled: _selectedTodoList != todoList,
+                onTap: () => setState(() {_selectedTodoList = todoList;}),
+                child: Text(todoList)
+              ),
+              PopupMenuItem(height: 0, child: PopupMenuDivider(height: 4,),),
+              PopupMenuItem(
+                child: Text('Add Todo List')
+              ),
+            ]
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [Text(_selectedTodoList), Icon(Icons.arrow_drop_down)],
+          ),
+        ),
         centerTitle: true,
         // Background color should be inherited from previous data
         backgroundColor: _isUrgent ? Colors.red[400] : Colors.teal[400],
@@ -151,6 +181,7 @@ class _TodoEditFormState extends State<TodoEditForm> {
                       widget.data.docID,
                       {
                         'title': _titleController.text,
+                        'todoList': _selectedTodoList,
                         'description': _descriptionController.text,
                         'deadline': _deadline,
                         'tags': _tags,
