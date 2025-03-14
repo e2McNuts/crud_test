@@ -3,6 +3,7 @@ import 'package:crud_test/data/services/firestore_todo_crud.dart';
 import 'package:crud_test/features/todo/presentation/widgets/todo_input_form.dart';
 import 'package:crud_test/features/todo/presentation/widgets/todo_list_item.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 class TodoPage extends StatelessWidget {
   const TodoPage({super.key});
@@ -35,7 +36,9 @@ class TodoPage extends StatelessWidget {
             builder: (context, snapshot) {
               if (!snapshot.hasData) {
                 //Loading or no data in TodoList -> To be implemented loadingIndicator and noDataIndicator
-                return Text('No Data...');
+                return SpinKitFadingCube(
+                  color: Colors.blue[300],
+                );
               } else {
                 // Build the list of todos with TodoListItem
                 return ListView.builder(
