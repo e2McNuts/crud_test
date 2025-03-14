@@ -21,7 +21,7 @@ class _TodoDetailedViewState extends State<TodoDetailedView> {
       
       // APPBAR Showing title, inheriting color from data
       appBar: AppBar(
-        title: Text('${widget.data.title}@TodoList1'),
+        title: Text('TodoList1'),
         centerTitle: true,
         backgroundColor:
           widget.data.isUrgent ? Colors.red[400] : Colors.teal[400],
@@ -46,12 +46,28 @@ class _TodoDetailedViewState extends State<TodoDetailedView> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Title
+            Text(
+              widget.data.title,
+              style: TextStyle(
+                fontSize: 24,
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+
+            Divider(
+              color: Colors.white,
+              height: 16,
+            ),
+
             // Description
             Text(
               widget.data.description!,
               style: TextStyle(
                 height: 1.2,
                 fontSize: 16,
+                color: Colors.white,
               ),
             ),
 

@@ -153,7 +153,7 @@ class _TodoEditFormState extends State<TodoEditForm> {
                         'title': _titleController.text,
                         'description': _descriptionController.text,
                         'deadline': _deadline,
-                        'tags': widget.data.tags,
+                        'tags': _tags,
                         'isUrgent': _isUrgent,                  
                         'timestamp': DateTime.now().millisecondsSinceEpoch,
                       }
