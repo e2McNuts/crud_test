@@ -1,4 +1,5 @@
 import 'package:crud_test/data/services/firestore_todo_crud.dart';
+import 'package:crud_test/data/services/firestore_todolist_crud.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -90,51 +91,78 @@ class _TodoInputFormState extends State<TodoInputForm> {
     });
   }
 
-  final List<String> _todoLists = [
-    "TodoList01",
-    "TodoList2",
-    "TodoList3",
-    "TodoList4"
-  ];
+  late List _todoLists = [];
+  late List _todoListsNames = [];
+  late String _selectedTodolist = '';
+  late String _selectedTodolistName = '';
 
-  late String _selectedTodoList;
+  void _getTodoLists() async {
+    FirestoreTodolistCRUD().getTodolistsStream().listen((event) {
+      setState(() {
+        _todoLists = event.docs.map((e) => e.id).toList();
+        _todoListsNames = event.docs.map((e) => e['title']).toList();
+        _todoListColor = event.docs.map((e)=> e['color']).toList();
+      });
+    });
+  }
+
+  late List _todoListColor = [];
+  late Color _selectedTodolistColor = Colors.teal;
 
   @override
   void initState() {
     super.initState();
-    _selectedTodoList = _todoLists[0];
+    _todoLists;
+    _todoListsNames;
+    _selectedTodolist;
+    _selectedTodolistName;
+    _getTodoLists();
+    _todoListColor;
+    _selectedTodolistColor;
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       // APPBAR showing TodoList, save and cancel button
+
       appBar: AppBar(
         title: GestureDetector(
-          onTap: () => showMenu(
-            context: context,
-            position: RelativeRect.fromLTRB(100, 70, 100, 0),
-            items: [
-              for (var todoList in _todoLists) PopupMenuItem(
-                enabled: _selectedTodoList != todoList,
-                onTap: () => setState(() {_selectedTodoList = todoList;}),
-                child: Text(todoList)
-              ),
-              PopupMenuItem(height: 0, child: PopupMenuDivider(height: 4,),),
-              PopupMenuItem(
-                child: Text('Add Todo List')
-              ),
-            ]
-          ),
+          onTap: () {
+            showDialog(
+              context: context,
+              builder: (BuildContext context) => AlertDialog(
+                  title: Text('TodoLists:'),
+                  content: ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: _todoLists.length,
+                      itemBuilder: (context, index) {
+                        return ListTile(
+                            title: Text(_todoListsNames[index]),
+                            onTap: () {
+                              setState(() {
+                                _selectedTodolist = _todoLists[index];
+                                _selectedTodolistName = _todoListsNames[index];
+                                _selectedTodolistColor = Color(_todoListColor[index]);
+                              });
+                              Navigator.pop(context);
+                            });
+                      })),
+            );
+          },
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
-            children: [Text(_selectedTodoList), Icon(Icons.arrow_drop_down)],
+            children: [
+              _selectedTodolist == ''
+                  ? Text('select todolist')
+                  : Text(_selectedTodolistName),
+              Icon(Icons.arrow_drop_down)
+            ],
           ),
         ),
         centerTitle: true,
         // color is standard or red for urgent -> changing with the TodoList
-        backgroundColor:
-            _isUrgent == false ? Colors.blue[400] : Colors.red[400],
+        backgroundColor: _isUrgent == false ? _selectedTodolistColor : Colors.red[400],
         foregroundColor: Colors.white,
 
         // Cancel Button
@@ -149,24 +177,30 @@ class _TodoInputFormState extends State<TodoInputForm> {
             valueListenable: _titleController,
             builder: (context, value, child) {
               return IconButton(
-                onPressed: value.text.isEmpty
-                    ? () => ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Title cannot be empty')))
-                    : () {
-                        FirestoreTodoCRUD().addTodo({
-                          'title': _titleController.text,
-                          'todoList': _selectedTodoList,
-                          'description': _descriptionController.text,
-                          'deadline': _deadline,
-                          'isDone': false,
-                          'tags': _tags,
-                          'isUrgent': _isUrgent,
-                          'timestamp': DateTime.now().millisecondsSinceEpoch,
-                        });
-                        Navigator.pop(context);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('Todo added')));
-                      },
+                onPressed: () {
+                  if (value.text.isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Title cannot be empty')));
+                  } else if (_selectedTodolist == '') {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Select a todolist')));
+                  } else {
+                    FirestoreTodoCRUD().addTodo({
+                      'title': _titleController.text,
+                      'todoList': _selectedTodolist,
+                      'description': _descriptionController.text,
+                      'deadline': _deadline,
+                      'isDone': false,
+                      'tags': _tags,
+                      'isUrgent': _isUrgent,
+                      'timestamp': DateTime.now().millisecondsSinceEpoch,
+                    });
+                    Navigator.pop(context);
+
+                    ScaffoldMessenger.of(context)
+                        .showSnackBar(SnackBar(content: Text('Todo added')));
+                  }
+                },
                 icon: Icon(Icons.check),
               );
             },

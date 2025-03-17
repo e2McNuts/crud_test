@@ -1,4 +1,5 @@
 import 'package:crud_test/data/models/todo_model.dart';
+import 'package:crud_test/data/services/firestore_todolist_crud.dart';
 import 'package:crud_test/features/todo/presentation/widgets/todo_edit_form.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -14,17 +15,54 @@ class TodoDetailedView extends StatefulWidget {
 
 class _TodoDetailedViewState extends State<TodoDetailedView> {
   @override
+  void initState() {
+    super.initState();
+    _getTodoListName();
+    _getTodoListColor();
+    _todoListName;
+    _todoListColor;
+  }
+
+  String _todoListName = '';
+  Color _todoListColor = Colors.teal;
+
+  void _getTodoListName() async {
+    FirestoreTodolistCRUD().getTodolistsStream().listen((event) {
+      for (var docs in event.docs) {
+        if (docs.id == widget.data.todoList) {
+          setState(() {
+            _todoListName = docs['title'].toString();
+          });
+          break;
+        }
+      }
+    });
+  }
+
+  void _getTodoListColor() async {
+    FirestoreTodolistCRUD().getTodolistsStream().listen((event) {
+      for (var docs in event.docs) {
+        if (docs.id == widget.data.todoList) {
+          setState(() {
+            _todoListColor = Color(docs['color']);
+          });
+          break;
+        }
+      }
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor:
-        widget.data.isUrgent ? Colors.red[100] : Colors.teal[100],
-      
+      backgroundColor: Colors.white,
+
       // APPBAR Showing title, inheriting color from data
       appBar: AppBar(
-        title: Text('@${widget.data.todoList}'),
+        title: Text('@$_todoListName'),
         centerTitle: true,
         backgroundColor:
-          widget.data.isUrgent ? Colors.red[400] : Colors.teal[400],
+            widget.data.isUrgent ? Colors.red[400] : _todoListColor,
         foregroundColor: Colors.white,
         actions: [
           // EDIT BUTTON
@@ -51,13 +89,13 @@ class _TodoDetailedViewState extends State<TodoDetailedView> {
               widget.data.title,
               style: TextStyle(
                 fontSize: 24,
-                color: Colors.white,
+                color: Colors.black,
                 fontWeight: FontWeight.bold,
               ),
             ),
 
             Divider(
-              color: Colors.white,
+              color: Colors.black,
               height: 16,
             ),
 
@@ -67,7 +105,7 @@ class _TodoDetailedViewState extends State<TodoDetailedView> {
               style: TextStyle(
                 height: 1.2,
                 fontSize: 16,
-                color: Colors.white,
+                color: Colors.black,
               ),
             ),
 
@@ -85,7 +123,7 @@ class _TodoDetailedViewState extends State<TodoDetailedView> {
                           widget.data.deadline!))
                       .toString()),
                 ),
-              
+
               // Tags
               if (widget.data.tags != null)
                 for (var tag in widget.data.tags!) Chip(label: Text(tag)),
