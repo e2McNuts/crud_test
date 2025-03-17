@@ -122,13 +122,13 @@ class _TodoEditFormState extends State<TodoEditForm> {
 
   void _getSelectedTodlistName() async {
     FirestoreTodolistCRUD().getTodolistsStream().listen((event) {
-      event.docs.forEach((element) {
+      for (var element in event.docs) {
         if (element.id == widget.data.todoList) {
           setState(() {
             _selectedTodoListName = element['title'];
           });
         }
-      });
+      }
     });
   }
 

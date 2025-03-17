@@ -11,7 +11,7 @@ class TodoListSelectionChips extends StatefulWidget {
 class _TodoListSelectionChipsState extends State<TodoListSelectionChips> {
   late List<String> _todoLists = [];
   late List<String> _todoListID = [];
-  late Set<String> _selectedTodoLists = {};
+  late final Set<String> _selectedTodoLists = {};
   late Set<String> selectedTodoListID = {};
   late bool _allSelected;
 

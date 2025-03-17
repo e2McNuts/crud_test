@@ -12,16 +12,16 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
-  final TextEditingController _TodolistNameController = TextEditingController();
+  final TextEditingController _todolistNameController = TextEditingController();
 
   void _deleteTodolist(String todolistID) {
     FirestoreTodolistCRUD().deleteTodolist(todolistID);
     FirestoreTodoCRUD().getTodosStream().listen((event) {
-      event.docs.forEach((element) {
+      for (var element in event.docs) {
         if (element['todoList'] == todolistID) {
           FirestoreTodoCRUD().deleteTodo(element.id);
         }
-      });
+      }
     });
   }
 
@@ -60,7 +60,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
                                         TextField(
-                                          controller: _TodolistNameController,
+                                          controller: _todolistNameController,
                                           decoration: InputDecoration(
                                             hintText: 'Todolist name',
                                           ),
@@ -76,7 +76,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                         child: Text('Cancel')),
                                     ValueListenableBuilder(
                                         valueListenable:
-                                            _TodolistNameController,
+                                            _todolistNameController,
                                         builder: (context, value, child) {
                                           return TextButton(
                                               onPressed: value.text.isEmpty
@@ -89,12 +89,12 @@ class _SettingsPageState extends State<SettingsPage> {
                                                       FirestoreTodolistCRUD()
                                                           .addTodolist({
                                                         'title':
-                                                            _TodolistNameController
+                                                            _todolistNameController
                                                                 .text,
                                                         'color': selectedColor[0].value,
                                                       });
                                                       Navigator.pop(context);
-                                                      _TodolistNameController
+                                                      _todolistNameController
                                                           .clear();
                                                     },
                                               child: Text('Add'));

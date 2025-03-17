@@ -17,7 +17,7 @@ final List _colors = [
   [Colors.orange[200], Colors.orange[300], Colors.orange[600]],
 ];
 
-late List selectedColor = _colors[0];
+List selectedColor = _colors[0];
 
 class _ColorSelectorState extends State<ColorSelector> {
   @override
