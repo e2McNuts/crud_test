@@ -1,0 +1,2 @@
+D:/Kalender App Flutter/crud_test/android/app/.cxx/Debug/1i6ls3l1/x86/CMakeFiles/edit_cache.dir
+D:/Kalender App Flutter/crud_test/android/app/.cxx/Debug/1i6ls3l1/x86/CMakeFiles/rebuild_cache.dir
