@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/services.dart';
 import 'features/settings/presentation/pages/settings_page.dart';
-import 'features/todo/presentation/pages/todo_page.dart';
+import 'features/todo/presentation/pages/todo_list_page.dart';
 import 'firebase_options.dart';
 
 void main() async {
@@ -22,7 +23,13 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   int index = 0;
 
-  final screens = [TodoPage(), SettingsPage()];
+  final screens = [TodoListPage(), SettingsPage()];
+
+  @override
+  void initState() {
+    super.initState();
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: [SystemUiOverlay.bottom]);
+  }
 
   @override
   Widget build(BuildContext context) {

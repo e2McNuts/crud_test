@@ -1,4 +1,4 @@
-import 'package:crud_test/features/settings/presentation/date_formatter.dart';
+import 'package:crud_test/features/settings/presentation/widgets/date_formatter.dart';
 import 'package:crud_test/features/todo/presentation/widgets/todo_tag.dart';
 import 'package:flutter/material.dart';
 

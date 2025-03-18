@@ -32,15 +32,9 @@ class _TodoListItemCountState extends State<TodoListItemCount> {
           final int itemCount = snapshot.data!.docs.length;
 
           if (itemCount == 1) {
-            return Text(
-              'has ${itemCount.toString()} Todo in it. It will be lost by deleting the Todolist. Continue?',
-              style: TextStyle(color: Colors.red),
-            );
+            return Text('There is ${itemCount.toString()} Todo left. Are you sure to delete them?');
           } else if (itemCount > 1) {
-            return Text(
-              'has ${itemCount.toString()} Todos in it. They will be lost by deleting the Todolist. Continue?',
-              style: TextStyle(color: Colors.red),
-            );
+            return Text('There are ${itemCount.toString()} Todos left. Are you sure to delete them?');
           } else {
             return Text('is empty.');
           }

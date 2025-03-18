@@ -6,8 +6,8 @@ import 'package:crud_test/features/todo/presentation/widgets/todo_list_selection
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 
-class TodoPage extends StatelessWidget {
-  const TodoPage({super.key});
+class TodoListPage extends StatelessWidget {
+  const TodoListPage({super.key});
 
   @override
   Widget build(BuildContext context) {

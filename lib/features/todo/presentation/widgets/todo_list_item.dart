@@ -1,6 +1,6 @@
 import 'package:crud_test/data/models/todo_model.dart';
 import 'package:crud_test/data/services/firestore_todo_crud.dart';
-import 'package:crud_test/features/settings/presentation/todo_list_color.dart';
+import 'package:crud_test/features/settings/presentation/widgets/todo_list_color.dart';
 import 'package:crud_test/features/todo/presentation/widgets/todo_check.dart';
 import 'package:crud_test/features/todo/presentation/widgets/todo_chips_wrap.dart';
 import 'package:crud_test/features/todo/presentation/widgets/todo_detailed_view.dart';

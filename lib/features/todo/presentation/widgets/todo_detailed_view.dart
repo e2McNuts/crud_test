@@ -44,7 +44,14 @@ class _TodoDetailedViewState extends State<TodoDetailedView> {
 
       // APPBAR Showing title, inheriting color from data
       appBar: AppBar(
-        title: Text('@$_todoListName'),
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.description),
+            SizedBox(width: 8),
+            Text(_todoListName),
+          ],
+        ),
         centerTitle: true,
         backgroundColor: widget.colors[0],
         foregroundColor: Colors.white,
