@@ -1,8 +1,9 @@
 import 'package:crud_test/data/models/todo_model.dart';
 import 'package:crud_test/data/services/firestore_todo_crud.dart';
-import 'package:crud_test/data/services/firestore_todolist_crud.dart';
+import 'package:crud_test/features/settings/presentation/todo_list_color.dart';
+import 'package:crud_test/features/todo/presentation/widgets/todo_check.dart';
+import 'package:crud_test/features/todo/presentation/widgets/todo_chips_wrap.dart';
 import 'package:crud_test/features/todo/presentation/widgets/todo_detailed_view.dart';
-import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 
 class TodoListItem extends StatefulWidget {
@@ -15,36 +16,51 @@ class TodoListItem extends StatefulWidget {
 }
 
 class _TodoListItemState extends State<TodoListItem> {
-  Color _todoListColor = Colors.teal;
-  Color _todListColorLight = Colors.teal;
-  Color _todListColorDark = Colors.teal;
-
-  void _getTodoListColor() async {
-    FirestoreTodolistCRUD().getTodolistsStream().listen((event) {
-      for (var docs in event.docs) {
-        if (docs.id == widget.data.todoList) {
-          setState(() {
-            _todoListColor = Color(docs['color']);
-            _todListColorLight = HSLColor.fromColor(Color(docs['color']))
-                .withLightness(.85)
-                .toColor();
-            _todListColorDark = HSLColor.fromColor(Color(docs['color']))
-                .withLightness(.4)
-                .toColor();
-          });
-          break;
-        }
+  // GET COLORS FOR LIST ITEM
+  late List<Color> todoListColors;
+  void _loadColors() async {
+    final result = await TodoListColor().getTodoListColor(widget.data.todoList);
+    setState(() {
+      if (!widget.data.isUrgent) {
+        todoListColors[0] =
+            HSLColor.fromColor(result).withLightness(.7).toColor();
+        todoListColors[1] =
+            HSLColor.fromColor(result).withLightness(.8).toColor();
+        todoListColors[2] =
+            HSLColor.fromColor(result).withLightness(.5).toColor();
+      } else {
+        todoListColors[0] =
+            HSLColor.fromColor(Colors.red).withLightness(.7).toColor();
+        todoListColors[1] =
+            HSLColor.fromColor(Colors.red).withLightness(.8).toColor();
+        todoListColors[2] =
+            HSLColor.fromColor(Colors.red).withLightness(.5).toColor();
       }
     });
+  }
+
+  // Todo Checking, Unchecking
+  void _checkTodo() {
+    if (widget.data.isDone == false) {
+      FirestoreTodoCRUD().updateTodo(widget.data.docID, {
+        'isDone': !widget.data.isDone,
+      });
+    }
+  }
+
+  void _uncheckTodo() {
+    if (widget.data.isDone == true) {
+      FirestoreTodoCRUD().updateTodo(widget.data.docID, {
+        'isDone': !widget.data.isDone,
+      });
+    }
   }
 
   @override
   void initState() {
     super.initState();
-    _getTodoListColor();
-    _todoListColor;
-    _todListColorLight;
-    _todListColorDark;
+    _loadColors();
+    todoListColors = [Colors.grey, Colors.grey, Colors.grey];
   }
 
   @override
@@ -54,14 +70,26 @@ class _TodoListItemState extends State<TodoListItem> {
         onDoubleTap: () => Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => TodoDetailedView(data: widget.data),
+                builder: (context) => TodoDetailedView(
+                  data: widget.data,
+                  colors: todoListColors,
+                ),
               ),
             ),
 
         // LIST ITEM STYLE
         child: Card(
-          // Card Color, red when urgent, teal when not -> soon to be replaced with color inherited from TodoListModel
-          color: widget.data.isUrgent ? Colors.red[200] : _todoListColor,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+            side: 
+            widget.data.isUrgent
+            ?BorderSide(
+              color: todoListColors[2],
+              width: 5,
+            )
+            :BorderSide(color: Colors.transparent),
+          ),
+          color: todoListColors[0],
           clipBehavior: Clip.hardEdge,
           child: IntrinsicHeight(
             child: Row(
@@ -79,122 +107,57 @@ class _TodoListItemState extends State<TodoListItem> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text(
+                            Flexible(child: Text(
                               widget.data.title,
+                              overflow: TextOverflow.ellipsis,
                               style: TextStyle(
                                 fontSize: 24,
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold,
                               ),
-                            ),
+                            )),
                             widget.data.isUrgent
                                 ? Icon(
                                     Icons.flag,
-                                    color: Colors.red,
+                                    color: todoListColors[2],
                                   )
                                 : Container(),
                           ],
                         ),
 
-                        // Description
+                        // Description => display nothing when there is no description
                         widget.data.description == null
                             ? Container()
                             : Text(
                                 widget.data.description!,
+                                maxLines: 3,
+                                overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
                                     height: 1.2,
                                     fontSize: 16,
                                     color: Colors.white),
                               ),
 
-                        // Deadline and Tags
+                        // Deadline and Tags => display nothing when there is no deadline or tags
                         Padding(
                           padding: const EdgeInsets.only(top: 8.0),
-                          child: Wrap(spacing: 4, runSpacing: -4, children: [
-                            //deadline
-                            if (widget.data.deadline != null)
-                              Chip(
-                                label: Text(DateFormat('d.M.yyyy')
-                                    .format(DateTime.fromMillisecondsSinceEpoch(
-                                        widget.data.deadline!))
-                                    .toString()),
-                              ),
-
-                            // tags
-                            if (widget.data.tags != null)
-                              for (var tag in widget.data.tags!)
-                                Chip(label: Text('#$tag')),
-                          ]),
+                          child: TodoChipsWrap(
+                            deadline: widget.data.deadline,
+                            tags: widget.data.tags,
+                            color: todoListColors[0],
+                          ),
                         ),
                       ],
                     ),
                   ),
                 ),
 
+                // Todo Check Panel
                 GestureDetector(
-                    onTap: () {
-                      if (widget.data.isDone == false) {
-                        FirestoreTodoCRUD().updateTodo(widget.data.docID, {
-                          'isDone': !widget.data.isDone,
-                        });
-                      }
-                    },
-                    onLongPress: () {
-                      if (widget.data.isDone == true) {
-                        FirestoreTodoCRUD().updateTodo(widget.data.docID, {
-                          'isDone': !widget.data.isDone,
-                        });
-                      }
-                    },
-                    child: Container(
-                        color: widget.data.isUrgent
-                            ? (widget.data.isDone
-                                ? Colors.red[600]
-                                : Colors.red[300])
-                            : (widget.data.isDone
-                                ? _todListColorDark
-                                : _todListColorLight),
-                        child: Row(
-                          children: [
-                            SizedBox(
-                              width: 16,
-                              child: Container(
-                                decoration: BoxDecoration(
-                                    gradient: LinearGradient(
-                                        begin: Alignment.topLeft,
-                                        end: Alignment.topRight,
-                                        colors: [
-                                      Color.fromARGB(115, 0, 0, 0),
-                                      Color(0x00000000)
-                                    ])),
-                              ),
-                            ),
-                            SizedBox(
-                              width: 60,
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.only(right: 10),
-                                    child: Icon(
-                                      widget.data.isDone
-                                          ? Icons.check_circle_outline_rounded
-                                          : Icons.circle_outlined,
-                                      size: 36,
-                                      color: Colors.white,
-                                      shadows: [
-                                        Shadow(
-                                            color: Color.fromARGB(115, 0, 0, 0),
-                                            blurRadius: 16.0)
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            )
-                          ],
-                        )))
+                    onTap: _checkTodo,
+                    onLongPress: _uncheckTodo,
+                    child: TodoCheck(
+                        colors: todoListColors, isDone: widget.data.isDone))
               ],
             ),
           ),

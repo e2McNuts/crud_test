@@ -12,7 +12,7 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
-  final TextEditingController _todolistNameController = TextEditingController();
+  late TextEditingController _todolistNameController;
 
   void _deleteTodolist(String todolistID) {
     FirestoreTodolistCRUD().deleteTodolist(todolistID);
@@ -28,6 +28,7 @@ class _SettingsPageState extends State<SettingsPage> {
   @override
   void initState() {
     super.initState();
+    _todolistNameController = TextEditingController();
   }
 
   @override
@@ -91,7 +92,9 @@ class _SettingsPageState extends State<SettingsPage> {
                                                         'title':
                                                             _todolistNameController
                                                                 .text,
-                                                        'color': selectedColor[0].value,
+                                                        'color':
+                                                            selectedColor[0]
+                                                                .value,
                                                       });
                                                       Navigator.pop(context);
                                                       _todolistNameController
@@ -117,11 +120,53 @@ class _SettingsPageState extends State<SettingsPage> {
                           return Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Text(snapshot.data!.docs[index]['title']),
+                                Row(children: [
+                                  Container(
+                                    color: Color(
+                                        snapshot.data!.docs[index]['color']),
+                                    child: SizedBox(
+                                      width: 16,
+                                      height: 16,
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    width: 8,
+                                  ),
+                                  Text(snapshot.data!.docs[index]['title']),
+                                ]),
                                 Row(
                                   children: [
                                     IconButton(
-                                      onPressed: null,
+                                      onPressed: () {
+                                        setState(() {
+                                          _todolistNameController = TextEditingController(text: snapshot.data!.docs[index]['title']);
+                                        
+                                          
+                                        });
+                                        showDialog(
+                                          context: context,
+                                          builder: (BuildContext context) {
+                                            return AlertDialog(
+                                                title: Text(
+                                                    'Edit ${snapshot.data!.docs[index]['title']}'),
+                                                content: Column(
+                                                  mainAxisSize:
+                                                      MainAxisSize.min,
+                                                  children: [
+                                                    TextField(
+                                                      
+
+                                                          
+                                                      controller:
+                                                          _todolistNameController,
+                                                    ),
+                                                    SizedBox(
+                                                      height: 16,
+                                                    ),
+                                                    ColorSelector()
+                                                  ],
+                                                ));
+                                          });},
                                       icon: Icon(
                                         Icons.edit,
                                       ),

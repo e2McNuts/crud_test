@@ -101,7 +101,7 @@ class _TodoInputFormState extends State<TodoInputForm> {
       setState(() {
         _todoLists = event.docs.map((e) => e.id).toList();
         _todoListsNames = event.docs.map((e) => e['title']).toList();
-        _todoListColor = event.docs.map((e)=> e['color']).toList();
+        _todoListColor = event.docs.map((e) => e['color']).toList();
       });
     });
   }
@@ -129,26 +129,56 @@ class _TodoInputFormState extends State<TodoInputForm> {
       appBar: AppBar(
         title: GestureDetector(
           onTap: () {
-            showDialog(
-              context: context,
-              builder: (BuildContext context) => AlertDialog(
-                  title: Text('TodoLists:'),
-                  content: ListView.builder(
-                      shrinkWrap: true,
-                      itemCount: _todoLists.length,
-                      itemBuilder: (context, index) {
-                        return ListTile(
-                            title: Text(_todoListsNames[index]),
-                            onTap: () {
-                              setState(() {
-                                _selectedTodolist = _todoLists[index];
-                                _selectedTodolistName = _todoListsNames[index];
-                                _selectedTodolistColor = Color(_todoListColor[index]);
-                              });
-                              Navigator.pop(context);
-                            });
-                      })),
-            );
+            final RenderBox renderBox = context.findRenderObject() as RenderBox;
+            final Offset position = renderBox.localToGlobal(Offset.zero);
+
+            showMenu(
+                context: context,
+                position: RelativeRect.fromLTRB(
+                  position.dx,
+                  position.dy,
+                  position.dx + renderBox.size.width,
+                  position.dy + renderBox.size.height,
+                ),
+                items: [
+                  for (var todolist in _todoListsNames)
+                    PopupMenuItem(
+                        onTap: () => setState(() {
+                              _selectedTodolist =
+                                  _todoLists[_todoListsNames.indexOf(todolist)];
+                              _selectedTodolistName = _todoListsNames[
+                                  _todoListsNames.indexOf(todolist)];
+                              _selectedTodolistColor = Color(_todoListColor[
+                                  _todoListsNames.indexOf(todolist)]);
+                            }),
+                        child: Text(
+                          todolist,
+                          style: TextStyle(
+                              color: Color(_todoListColor[
+                                  _todoListsNames.indexOf(todolist)])),
+                        )),
+                ]);
+
+            // showDialog(
+            //   context: context,
+            //   builder: (BuildContext context) => AlertDialog(
+            //       title: Text('TodoLists:'),
+            //       content: ListView.builder(
+            //           shrinkWrap: true,
+            //           itemCount: _todoLists.length,
+            //           itemBuilder: (context, index) {
+            //             return ListTile(
+            //                 title: Text(_todoListsNames[index]),
+            //                 onTap: () {
+            //                   setState(() {
+            //                     _selectedTodolist = _todoLists[index];
+            //                     _selectedTodolistName = _todoListsNames[index];
+            //                     _selectedTodolistColor = Color(_todoListColor[index]);
+            //                   });
+            //                   Navigator.pop(context);
+            //                 });
+            //           })),
+            // );
           },
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -162,7 +192,8 @@ class _TodoInputFormState extends State<TodoInputForm> {
         ),
         centerTitle: true,
         // color is standard or red for urgent -> changing with the TodoList
-        backgroundColor: _isUrgent == false ? _selectedTodolistColor : Colors.red[400],
+        backgroundColor:
+            _isUrgent == false ? _selectedTodolistColor : Colors.red[400],
         foregroundColor: Colors.white,
 
         // Cancel Button

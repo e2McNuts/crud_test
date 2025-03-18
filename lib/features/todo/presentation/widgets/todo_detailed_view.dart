@@ -1,13 +1,14 @@
 import 'package:crud_test/data/models/todo_model.dart';
 import 'package:crud_test/data/services/firestore_todolist_crud.dart';
+import 'package:crud_test/features/todo/presentation/widgets/todo_chips_wrap.dart';
 import 'package:crud_test/features/todo/presentation/widgets/todo_edit_form.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
 class TodoDetailedView extends StatefulWidget {
   final TodoModel data;
+  final List<Color> colors;
 
-  const TodoDetailedView({super.key, required this.data});
+  const TodoDetailedView({super.key, required this.data, required this.colors});
 
   @override
   State<TodoDetailedView> createState() => _TodoDetailedViewState();
@@ -18,13 +19,10 @@ class _TodoDetailedViewState extends State<TodoDetailedView> {
   void initState() {
     super.initState();
     _getTodoListName();
-    _getTodoListColor();
     _todoListName;
-    _todoListColor;
   }
 
   String _todoListName = '';
-  Color _todoListColor = Colors.teal;
 
   void _getTodoListName() async {
     FirestoreTodolistCRUD().getTodolistsStream().listen((event) {
@@ -32,19 +30,6 @@ class _TodoDetailedViewState extends State<TodoDetailedView> {
         if (docs.id == widget.data.todoList) {
           setState(() {
             _todoListName = docs['title'].toString();
-          });
-          break;
-        }
-      }
-    });
-  }
-
-  void _getTodoListColor() async {
-    FirestoreTodolistCRUD().getTodolistsStream().listen((event) {
-      for (var docs in event.docs) {
-        if (docs.id == widget.data.todoList) {
-          setState(() {
-            _todoListColor = Color(docs['color']);
           });
           break;
         }
@@ -61,8 +46,7 @@ class _TodoDetailedViewState extends State<TodoDetailedView> {
       appBar: AppBar(
         title: Text('@$_todoListName'),
         centerTitle: true,
-        backgroundColor:
-            widget.data.isUrgent ? Colors.red[400] : _todoListColor,
+        backgroundColor: widget.colors[0],
         foregroundColor: Colors.white,
         actions: [
           // EDIT BUTTON
@@ -85,14 +69,22 @@ class _TodoDetailedViewState extends State<TodoDetailedView> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Title
-            Text(
-              widget.data.title,
-              style: TextStyle(
-                fontSize: 24,
-                color: Colors.black,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
+            Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Flexible(child: Text(
+                    widget.data.title,
+                    style: TextStyle(
+                      fontSize: 24,
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  )),
+                  widget.data.isUrgent
+                      ? Icon(Icons.flag, color: widget.colors[2])
+                      : Container(),
+                ]),
 
             Divider(
               color: Colors.black,
@@ -114,20 +106,11 @@ class _TodoDetailedViewState extends State<TodoDetailedView> {
             ),
 
             // Deadline and Tags
-            Wrap(spacing: 4, runSpacing: -4, children: [
-              // Deadline
-              if (widget.data.deadline != null)
-                Chip(
-                  label: Text(DateFormat('d.M.yyyy')
-                      .format(DateTime.fromMillisecondsSinceEpoch(
-                          widget.data.deadline!))
-                      .toString()),
-                ),
-
-              // Tags
-              if (widget.data.tags != null)
-                for (var tag in widget.data.tags!) Chip(label: Text(tag)),
-            ]),
+            TodoChipsWrap(
+              deadline: widget.data.deadline,
+              tags: widget.data.tags,
+              color: widget.colors[0],
+            )
           ],
         ),
       ),

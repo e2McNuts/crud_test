@@ -24,14 +24,13 @@ class _ColorSelectorState extends State<ColorSelector> {
   Widget build(BuildContext context) {
     return Wrap(
       children: [
-        for(List color in _colors)
+        for (List color in _colors)
           IconButton(
-            onPressed: (){
+            onPressed: () {
               setState(() {
                 selectedColor = color;
-                
               });
-            }, 
+            },
             color: color[1],
             icon: Icon(Icons.palette_outlined),
             isSelected: selectedColor == color,

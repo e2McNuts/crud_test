@@ -29,7 +29,8 @@ class TodoPage extends StatelessWidget {
         ),
 
         // BODY, LIST OF TODOS
-        body: Stack(children: [
+        body: Column(children: [
+          TodoListSelectionChips(),
           Expanded(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -66,7 +67,7 @@ class TodoPage extends StatelessWidget {
                   }),
             ),
           ),
-          TodoListSelectionChips()
+          
         ]));
   }
 }
