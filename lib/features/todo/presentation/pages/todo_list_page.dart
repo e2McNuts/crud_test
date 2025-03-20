@@ -1,6 +1,6 @@
 import 'package:crud_test/data/models/todo_model.dart';
 import 'package:crud_test/data/services/firestore_todo_crud.dart';
-import 'package:crud_test/features/todo/presentation/widgets/todo_input_form.dart';
+import 'package:crud_test/features/todo/presentation/pages/todo_form.dart';
 import 'package:crud_test/features/todo/presentation/widgets/todo_list_item.dart';
 import 'package:crud_test/features/todo/presentation/widgets/todo_list_selection_chips.dart';
 import 'package:flutter/material.dart';
@@ -19,7 +19,7 @@ class TodoListPage extends StatelessWidget {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => const TodoInputForm(),
+                builder: (context) => const TodoForm(),
               ),
             );
           },

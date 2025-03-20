@@ -1,7 +1,7 @@
 import 'package:crud_test/data/models/todo_model.dart';
 import 'package:crud_test/data/services/firestore_todolist_crud.dart';
 import 'package:crud_test/features/todo/presentation/widgets/todo_chips_wrap.dart';
-import 'package:crud_test/features/todo/presentation/widgets/todo_edit_form.dart';
+import 'package:crud_test/features/todo/presentation/pages/todo_form.dart';
 import 'package:flutter/material.dart';
 
 class TodoDetailedView extends StatefulWidget {
@@ -61,7 +61,7 @@ class _TodoDetailedViewState extends State<TodoDetailedView> {
             onPressed: () => Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => TodoEditForm(data: widget.data),
+                builder: (context) => TodoForm(data: widget.data, colors: widget.colors,),
               ),
             ),
             icon: Icon(Icons.edit),

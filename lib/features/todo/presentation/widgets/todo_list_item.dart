@@ -72,7 +72,7 @@ class _TodoListItemState extends State<TodoListItem> {
               MaterialPageRoute(
                 builder: (context) => TodoDetailedView(
                   data: widget.data,
-                  colors: todoListColors,
+                  colors: todoListColors
                 ),
               ),
             ),
