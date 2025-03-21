@@ -6,8 +6,21 @@ import 'package:crud_test/features/todo/presentation/widgets/todo_list_selection
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 
-class TodoListPage extends StatelessWidget {
+class TodoListPage extends StatefulWidget {
   const TodoListPage({super.key});
+
+  @override
+  State<TodoListPage> createState() => _TodoListPageState();
+}
+
+class _TodoListPageState extends State<TodoListPage> {
+  late Set<String> _selectedTodoListID;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedTodoListID = {};
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +43,11 @@ class TodoListPage extends StatelessWidget {
 
         // BODY, LIST OF TODOS
         body: Column(children: [
-          TodoListSelectionChips(),
+          TodoListSelectionChips(
+            onChanged: (value) => setState(() {
+              _selectedTodoListID = value;
+            }),
+          ),
           Expanded(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -60,14 +77,13 @@ class TodoListPage extends StatelessWidget {
                             isUrgent: snapshot.data!.docs[index]['isUrgent'],
                           );
                           // returning data as TodoListItem
-                          return TodoListItem(data: data);
+                          return TodoListItem(data: data, selectedTodoListID: _selectedTodoListID,);
                         },
                       );
                     }
                   }),
             ),
           ),
-          
         ]));
   }
 }

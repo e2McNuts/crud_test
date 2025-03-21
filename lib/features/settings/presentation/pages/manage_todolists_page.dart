@@ -53,7 +53,7 @@ class _ManageTodolistsPageState extends State<ManageTodolistsPage> {
                   hintText: 'Todolist',
                 ),
               ),
-              new ColorSelector(),
+              ColorSelector(),
             ],
           ),
         );

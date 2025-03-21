@@ -1,9 +1,11 @@
-import 'dart:async';
 import 'package:crud_test/data/services/firestore_todolist_crud.dart';
+import 'dart:async';
 import 'package:flutter/material.dart';
 
 class TodoListSelectionChips extends StatefulWidget {
-  const TodoListSelectionChips({super.key});
+  final ValueChanged<Set<String>> onChanged;
+
+  const TodoListSelectionChips({super.key, required this.onChanged});
 
   @override
   State<TodoListSelectionChips> createState() => _TodoListSelectionChipsState();
@@ -20,7 +22,8 @@ class _TodoListSelectionChipsState extends State<TodoListSelectionChips> {
 
   void _getTodoLists() {
     // Assign the subscription to _subscription
-    _subscription = FirestoreTodolistCRUD().getTodolistsStream().listen((event) {
+    _subscription =
+        FirestoreTodolistCRUD().getTodolistsStream().listen((event) {
       if (!mounted) return; // Check if widget is still mounted
       setState(() {
         _todoLists = event.docs.map((e) => e['title'].toString()).toList();
@@ -32,7 +35,9 @@ class _TodoListSelectionChipsState extends State<TodoListSelectionChips> {
         selectedTodoListID
           ..clear()
           ..addAll(_todoListID);
-        _allSelected = _todoLists.isNotEmpty && _todoLists.length == _selectedTodoLists.length;
+        widget.onChanged(selectedTodoListID);
+        _allSelected = _todoLists.isNotEmpty &&
+            _todoLists.length == _selectedTodoLists.length;
       });
     });
   }
@@ -45,7 +50,8 @@ class _TodoListSelectionChipsState extends State<TodoListSelectionChips> {
 
   @override
   void dispose() {
-    _subscription?.cancel(); // Cancel the subscription when the widget is disposed
+    _subscription
+        ?.cancel(); // Cancel the subscription when the widget is disposed
     super.dispose();
   }
 
@@ -67,9 +73,11 @@ class _TodoListSelectionChipsState extends State<TodoListSelectionChips> {
                   if (selected) {
                     _selectedTodoLists.addAll(_todoLists);
                     selectedTodoListID.addAll(_todoListID);
+                    widget.onChanged(selectedTodoListID);
                   } else {
                     _selectedTodoLists.clear();
                     selectedTodoListID.clear();
+                    widget.onChanged(selectedTodoListID);
                   }
                 });
               },
@@ -82,13 +90,17 @@ class _TodoListSelectionChipsState extends State<TodoListSelectionChips> {
                   setState(() {
                     if (selected) {
                       _selectedTodoLists.add(list);
-                      selectedTodoListID.add(_todoListID[_todoLists.indexOf(list)]);
+                      selectedTodoListID
+                          .add(_todoListID[_todoLists.indexOf(list)]);
                     } else {
                       _selectedTodoLists.remove(list);
-                      selectedTodoListID.remove(_todoListID[_todoLists.indexOf(list)]);
+                      selectedTodoListID
+                          .remove(_todoListID[_todoLists.indexOf(list)]);
                     }
-                    _allSelected = _selectedTodoLists.length == _todoLists.length;
+                    _allSelected =
+                        _selectedTodoLists.length == _todoLists.length;
                   });
+                  widget.onChanged(selectedTodoListID);
                 },
               );
             }),

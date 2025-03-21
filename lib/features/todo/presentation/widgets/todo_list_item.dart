@@ -8,8 +8,9 @@ import 'package:flutter/material.dart';
 
 class TodoListItem extends StatefulWidget {
   final TodoModel data;
+  final Set<String> selectedTodoListID;
 
-  const TodoListItem({super.key, required this.data});
+  const TodoListItem({super.key, required this.data, required this.selectedTodoListID});
 
   @override
   State<TodoListItem> createState() => _TodoListItemState();
@@ -66,101 +67,101 @@ class _TodoListItemState extends State<TodoListItem> {
   @override
   Widget build(BuildContext context) {
     // SHOW DETAIL VIEW ON DOUBLE TAP
-    return GestureDetector(
-        onDoubleTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => TodoDetailedView(
-                  data: widget.data,
-                  colors: todoListColors
-                ),
-              ),
-            ),
-
-        // LIST ITEM STYLE
-        child: Card(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-            side: 
-            widget.data.isUrgent
-            ?BorderSide(
-              color: todoListColors[2],
-              width: 5,
-            )
-            :BorderSide(color: Colors.transparent),
-          ),
-          color: todoListColors[0],
-          clipBehavior: Clip.hardEdge,
-          child: IntrinsicHeight(
-            child: Row(
-              children: [
-                // CARD LEFT COLUMN
-                Flexible(
-                  flex: 1,
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Title, Flag when urgent
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Flexible(child: Text(
-                              widget.data.title,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                fontSize: 24,
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            )),
-                            widget.data.isUrgent
-                                ? Icon(
-                                    Icons.flag,
-                                    color: todoListColors[2],
-                                  )
-                                : Container(),
-                          ],
-                        ),
-
-                        // Description => display nothing when there is no description
-                        widget.data.description == null
-                            ? Container()
-                            : Text(
-                                widget.data.description!,
-                                maxLines: 3,
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                    height: 1.2,
-                                    fontSize: 16,
-                                    color: Colors.white),
-                              ),
-
-                        // Deadline and Tags => display nothing when there is no deadline or tags
-                        Padding(
-                          padding: const EdgeInsets.only(top: 8.0),
-                          child: TodoChipsWrap(
-                            deadline: widget.data.deadline,
-                            tags: widget.data.tags,
-                            color: todoListColors[0],
-                          ),
-                        ),
-                      ],
-                    ),
+    return widget.selectedTodoListID.contains(widget.data.todoList)
+        ? GestureDetector(
+            onDoubleTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => TodoDetailedView(
+                        data: widget.data, colors: todoListColors),
                   ),
                 ),
 
-                // Todo Check Panel
-                GestureDetector(
-                    onTap: _checkTodo,
-                    onLongPress: _uncheckTodo,
-                    child: TodoCheck(
-                        colors: todoListColors, isDone: widget.data.isDone))
-              ],
-            ),
-          ),
-        ));
+            // LIST ITEM STYLE
+            child: Card(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+                side: widget.data.isUrgent
+                    ? BorderSide(
+                        color: todoListColors[2],
+                        width: 5,
+                      )
+                    : BorderSide(color: Colors.transparent),
+              ),
+              color: todoListColors[0],
+              clipBehavior: Clip.hardEdge,
+              child: IntrinsicHeight(
+                child: Row(
+                  children: [
+                    // CARD LEFT COLUMN
+                    Flexible(
+                      flex: 1,
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Title, Flag when urgent
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Flexible(
+                                    child: Text(
+                                  widget.data.title,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    fontSize: 24,
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                )),
+                                widget.data.isUrgent
+                                    ? Icon(
+                                        Icons.flag,
+                                        color: todoListColors[2],
+                                      )
+                                    : Container(),
+                              ],
+                            ),
+
+                            // Description => display nothing when there is no description
+                            widget.data.description == null
+                                ? Container()
+                                : Text(
+                                    widget.data.description!,
+                                    maxLines: 3,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                        height: 1.2,
+                                        fontSize: 16,
+                                        color: Colors.white),
+                                  ),
+
+                            // Deadline and Tags => display nothing when there is no deadline or tags
+                            Padding(
+                              padding: const EdgeInsets.only(top: 8.0),
+                              child: TodoChipsWrap(
+                                deadline: widget.data.deadline,
+                                tags: widget.data.tags,
+                                color: todoListColors[0],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+
+                    // Todo Check Panel
+                    GestureDetector(
+                        onTap: _checkTodo,
+                        onLongPress: _uncheckTodo,
+                        child: TodoCheck(
+                            colors: todoListColors, isDone: widget.data.isDone))
+                  ],
+                ),
+              ),
+            ))
+        : Container();
   }
 }
