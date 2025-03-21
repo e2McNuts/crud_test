@@ -166,7 +166,6 @@ class _TodoFormState extends State<TodoForm> {
                                     DateTime.now().millisecondsSinceEpoch,
                               });
                               Navigator.pop(context);
-                              Navigator.pop(context);
                               ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                                   content: Text(
                                       'Todo (${_titleController.text}) updated!')));

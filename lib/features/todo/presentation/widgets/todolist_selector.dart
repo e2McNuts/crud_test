@@ -67,8 +67,9 @@ class _TodolistSelectorState extends State<TodolistSelector> {
           children: [
             Text(widget.selected.isEmpty
                 ? 'Select Todolist'
-                : _todoLists
-                    .firstWhere((todo) => todo[0] == widget.selected)[1]),
+                : _todoLists.isNotEmpty
+                    ? _todoLists.firstWhere((todo) => todo[0] == widget.selected, orElse: () => ['', 'Unknown', null])[1]
+                    : 'Unknown'),
             SizedBox(width: 8),
             Icon(Icons.arrow_drop_down)
           ],
