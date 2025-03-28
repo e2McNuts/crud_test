@@ -16,6 +16,7 @@ class TodolistSelector extends StatefulWidget {
 
 class _TodolistSelectorState extends State<TodolistSelector> {
   final ExpansionTileController controller = ExpansionTileController();
+  final GlobalKey _gestureKey = GlobalKey(); // Add GlobalKey
 
   late List _todoLists = [];
 
@@ -41,38 +42,72 @@ class _TodolistSelectorState extends State<TodolistSelector> {
   Widget build(BuildContext context) {
     return GestureDetector(
         onTap: () {
+          final RenderBox renderBox =
+              _gestureKey.currentContext!.findRenderObject() as RenderBox;
+          final Offset centerBottom = renderBox.localToGlobal(
+              Offset(renderBox.size.width / 2, renderBox.size.height));
+          final Rect anchor =
+              Rect.fromCenter(center: centerBottom, width: 1, height: 1);
+          final RelativeRect position = RelativeRect.fromRect(
+            anchor,
+            Offset.zero & MediaQuery.of(context).size,
+          );
+
           showMenu(
               context: context,
-              position: RelativeRect.fromLTRB(0, 0, 0, 0),
+              position: position,
               items: [
                 for (List list in _todoLists)
                   PopupMenuItem(
-                    child: Text(list[1]),
+                    child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(list[1]),
+                          Icon(
+                            Icons.circle,
+                            color: HSLColor.fromAHSL(1, list[2], 1, .5).toColor(),
+                          )
+                        ]),
                     onTap: () {
                       widget.onSelected(list);
                     },
                   ),
-                PopupMenuItem(child: PopupMenuDivider()),
+                const PopupMenuItem(height: 0, child: Divider()),
                 PopupMenuItem(
                     onTap: () {
                       Navigator.push(
-                          context, MaterialPageRoute(builder: (context)=> ManageTodolistsPage()));
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => ManageTodolistsPage()));
                     },
-                    child: Text('Manage Todolists'))
+                    child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text('Manage Todolists'),
+                          Icon(Icons.settings, color: Colors.grey[700])
+                        ]))
               ]);
         },
-        child: Row(
-          mainAxisSize: MainAxisSize.max,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(widget.selected.isEmpty
-                ? 'Select Todolist'
-                : _todoLists.isNotEmpty
-                    ? _todoLists.firstWhere((todo) => todo[0] == widget.selected, orElse: () => ['', 'Unknown', null])[1]
-                    : 'Unknown'),
-            SizedBox(width: 8),
-            Icon(Icons.arrow_drop_down)
-          ],
-        ));
+        child: Container(
+            key: _gestureKey, // Assign the GlobalKey here
+            color: Colors.transparent,
+            child: Row(
+              mainAxisSize: MainAxisSize.max,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  widget.selected.isEmpty
+                      ? 'Select Todolist'
+                      : _todoLists.isNotEmpty
+                          ? _todoLists.firstWhere(
+                              (todo) => todo[0] == widget.selected,
+                              orElse: () => ['', 'Unknown', null])[1]
+                          : 'Unknown',
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(width: 8),
+                const Icon(Icons.arrow_drop_down)
+              ],
+            )));
   }
 }

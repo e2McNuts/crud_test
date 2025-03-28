@@ -8,13 +8,15 @@ class ColorSelector extends StatefulWidget {
 }
 
 final List _colors = [
-  [Colors.teal[200], Colors.teal[300], Colors.teal[600]],
-  [Colors.blue[200], Colors.blue[300], Colors.blue[600]],
-  [Colors.red[200], Colors.red[300], Colors.red[600]],
-  [Colors.yellow[200], Colors.yellow[300], Colors.yellow[600]],
-  [Colors.green[200], Colors.green[300], Colors.green[600]],
-  [Colors.purple[200], Colors.purple[300], Colors.purple[600]],
-  [Colors.orange[200], Colors.orange[300], Colors.orange[600]],
+  [Colors.pink[300], Colors.pink[600], Colors.pink[800]],
+  [Colors.purple[300], Colors.purple[600], Colors.purple[800]],
+  [Colors.indigo[300], Colors.indigo[600], Colors.indigo[800]],
+  [Colors.lightBlue[300], Colors.lightBlue[600], Colors.lightBlue[800]],
+  [Colors.teal[300], Colors.teal[600], Colors.teal[800]],
+  [Colors.green[300], Colors.green[600], Colors.green[800]],
+  [Colors.lime[300], Colors.lime[600], Colors.lime[800]],
+  [Colors.amber[300], Colors.amber[600], Colors.amber[800]],
+  [Colors.deepOrange[300], Colors.deepOrange[600], Colors.deepOrange[800]]
 ];
 
 List selectedColor = _colors[0];

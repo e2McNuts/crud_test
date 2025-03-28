@@ -16,7 +16,10 @@ class TodoChipsWrap extends StatefulWidget {
 class _TodoChipsWrapState extends State<TodoChipsWrap> {
   @override
   Widget build(BuildContext context) {
-    return Wrap(
+    return Column(children: [
+      if(widget.deadline != null || widget.tags != null)
+      SizedBox(height: 16),
+      Wrap(
       spacing: 8,
       runSpacing: 8,
       children: [
@@ -41,6 +44,6 @@ class _TodoChipsWrapState extends State<TodoChipsWrap> {
               leading: Icons.sell,
             ),
       ],
-    );
+    )]);
   }
 }

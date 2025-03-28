@@ -60,13 +60,14 @@ class _TodoListSelectionChipsState extends State<TodoListSelectionChips> {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Padding(
-        padding: const EdgeInsets.all(8),
+        padding: const EdgeInsets.symmetric(horizontal: 8),
         child: Row(
           spacing: 8,
           children: [
             FilterChip(
               label: const Text('All'),
               selected: _allSelected,
+              elevation: 1,
               onSelected: (bool selected) {
                 setState(() {
                   _allSelected = selected;
@@ -85,6 +86,7 @@ class _TodoListSelectionChipsState extends State<TodoListSelectionChips> {
             ..._todoLists.map((list) {
               return FilterChip(
                 label: Text(list),
+                elevation: 1,
                 selected: _selectedTodoLists.contains(list),
                 onSelected: (bool selected) {
                   setState(() {

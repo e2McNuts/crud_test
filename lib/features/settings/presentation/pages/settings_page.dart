@@ -1,3 +1,4 @@
+import 'package:crud_test/features/settings/presentation/pages/manage_agenda_page.dart';
 import 'package:crud_test/features/settings/presentation/pages/manage_todolists_page.dart';
 import 'package:flutter/material.dart';
 
@@ -25,6 +26,11 @@ class _SettingsPageState extends State<SettingsPage> {
             trailing: Icon(Icons.arrow_forward_rounded),
             onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ManageTodolistsPage())),
           ),
+          ListTile(
+            title: Text('Manage Agenda'),
+            trailing: Icon(Icons.arrow_forward_rounded),
+            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ManageAgendaPage())),
+          )
         ],
       ),
     );

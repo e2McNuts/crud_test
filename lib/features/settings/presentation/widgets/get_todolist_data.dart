@@ -1,6 +1,7 @@
 import 'package:crud_test/data/services/firestore_todo_crud.dart';
 import 'package:crud_test/data/services/firestore_todolist_crud.dart';
 import 'package:crud_test/features/settings/presentation/widgets/todo_list_item_count.dart';
+import 'package:crud_test/features/settings/presentation/widgets/todolist_form.dart';
 import 'package:flutter/material.dart';
 
 class GetTodolistData extends StatefulWidget {
@@ -55,14 +56,15 @@ class _GetTodolistDataState extends State<GetTodolistData> {
                     Row(
                       children: [
                         Icon(Icons.circle,
-                            color: Color(todolistItems[index]['color'])),
+                            color: HSLColor.fromAHSL(1, todolistItems[index]['color'], 1, .5).toColor()),
                         SizedBox(width: 8),
                         Text(todolistItems[index]['title'])
                       ],
                     ),
                     Row(
                       children: [
-                        IconButton(onPressed: null, icon: Icon(Icons.edit)),
+                        IconButton(onPressed: ()=> Navigator.push(context, MaterialPageRoute(builder: (BuildContext context)=> TodolistForm(ListID: todolistItems[index]['listID'], ListName: todolistItems[index]['title'], ListColor: todolistItems[index]['color'],))),
+                        icon: Icon(Icons.edit)),
                         IconButton(
                             onPressed: todolistItems.length <= 1
                                 ? null

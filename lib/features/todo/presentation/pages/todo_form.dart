@@ -125,7 +125,7 @@ class _TodoFormState extends State<TodoForm> {
             onSelected: (newSelectedId) {
               setState(() {
                 _selectedTodoList = newSelectedId[0]; // Update the selected ID
-                _selectedColor = Color(newSelectedId[2]);
+                _selectedColor = HSLColor.fromAHSL(1, newSelectedId[2], 1, .5).toColor();
               });
             },
           ),
